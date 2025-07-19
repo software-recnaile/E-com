@@ -1,0 +1,22 @@
+name: Defang Deploy
+
+on:
+  push:
+    branches: [main]
+  # Or use 'on: [push]' to deploy on all branches
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Defang CLI
+        run: |
+          curl -fsSL https://s.defang.io/install | sh
+
+      - name: Authenticate with Defang
+        run: defang login --token ${{ secrets.DEFANG_TOKEN }}
+
+      - name: Deploy with Defang Compose
+        run: defang compose up --non-interactive
