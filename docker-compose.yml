@@ -1,0 +1,79 @@
+#version: '3.8'
+#
+#services:
+#  mongodb:
+#    image: mongo:6.0
+#    container_name: mongodb
+#    ports:
+#      - "27017:27017"
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: Ram#2123
+#    volumes:
+#      - mongodb_data:/data/db
+#
+#  feature1-service:
+#    build: ./Authservice
+#    container_name: authservice
+#    ports:
+#      - "8081:8081"
+###    depends_on:
+###      - mongodb
+##    environment:
+##      SPRING_DATA_MONGODB_URI: mongodb://root:Ram#2123@mongodb:27017/auth_db?authSource=admin
+#
+#  feature2-service:
+#    build: ./oauthService
+#    container_name: oauthService
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - mongodb
+#    environment:
+#      SPRING_DATA_MONGODB_URI: mongodb://root:Ram#2123@mongodb:27017/auth_db?authSource=admin
+#
+#volumes:
+#  mongodb_data:
+
+
+#version: '3.8'
+#
+#services:
+#  feature1-service:
+#    build: ./authservice
+#    container_name: authservice
+#    ports:
+#      - "8081:8081"
+#    environment:
+#      # Use your actual MongoDB Atlas URI here
+#      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
+#
+#  feature2-service:
+#    build: ./oauthService
+#    container_name: oauthService
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      # Use your actual MongoDB Atlas URI here
+#      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
+
+
+version: '3.8'
+
+services:
+  feature1-service:
+    build: ./authservice
+    container_name: authservice
+    ports:
+      - "8081:8081"
+    environment:
+      # MongoDB Atlas connection URI with database auth-db
+      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
+
+  feature2-service:
+    build: ./oauthService
+    container_name: oauthService
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
