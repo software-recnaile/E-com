@@ -1,28 +1,17 @@
-
-
-
-FROM maven:3.9.5-eclipse-temurin-21 AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
 
-# Copy project files
+
+
 COPY pom.xml .
 RUN mvn dependency:go-offline
-
 COPY src ./src
-
-# Package the app
 RUN mvn clean package -DskipTests
 
-# -------- Run Stage --------
-FROM eclipse-temurin:21-jdk-jammy
+# Run stage
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
-
-# Copy jar from build stage
 COPY --from=build /app/target/*.jar app.jar
-
-EXPOSE 8080
-
-# Start the service
+EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -71,17 +71,17 @@
 //}
 
 
-package com.recnaile.authService.controller;
+package com.recnaile.oauthService.controller;
 
-import com.recnaile.authService.dto.AuthRequest;
-import com.recnaile.authService.dto.AuthResponse;
-import com.recnaile.authService.dto.OtpRequest;
-import com.recnaile.authService.dto.PasswordResetRequest;
-import com.recnaile.authService.dto.ResetPasswordRequest;
-import com.recnaile.authService.dto.SignUpRequest;
-import com.recnaile.authService.service.AuthService;
-import com.recnaile.authService.service.OtpService;
-import com.recnaile.authService.service.UserService;
+import com.recnaile.oauthService.dto.AuthRequest;
+import com.recnaile.oauthService.dto.AuthResponse;
+import com.recnaile.oauthService.dto.OtpRequest;
+import com.recnaile.oauthService.dto.PasswordResetRequest;
+import com.recnaile.oauthService.dto.ResetPasswordRequest;
+import com.recnaile.oauthService.dto.SignUpRequest;
+import com.recnaile.oauthService.service.AuthService;
+import com.recnaile.oauthService.service.OtpService;
+import com.recnaile.oauthService.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -89,7 +89,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-
 public class AuthController {
     @Autowired
     private AuthService authService;

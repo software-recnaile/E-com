@@ -61,33 +61,107 @@
 
 
 
+#version: '3.8'
+#
+#services:
+#  feature1-service:
+#    build: ./authservice
+#    container_name: authservice
+#    ports:
+#      - "8081:8081"
+#    environment:
+#      # MongoDB Atlas connection URI with database auth-db
+#      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
+#
+##  feature2-service:
+##    build: ./oauthService
+##    container_name: oauthService
+##    ports:
+##      - "8082:8082"
+##    environment:
+##      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
+#
+#  feature3-service:
+#    build: ./productservice
+#    container_name: productservice
+#    ports:
+#      - "8083:8083"
+#    environment:
+#      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/product-db?retryWrites=true&w=majority&appName=Recnaile
+
+
+
+
 version: '3.8'
 
 services:
-  feature1-service:
+  authservice:
     build: ./authservice
-    container_name: authservice
+    container_name: authservices
     ports:
       - "8081:8081"
     environment:
-      # MongoDB Atlas connection URI with database auth-db
-      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
+      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/user-db?retryWrites=true&w=majority&appName=Recnaile
+      # Add these environment variables
+      SPRING_APPLICATION_NAME: auth-service
+      SERVER_PORT: 8081
+      # Allow all origins in development (optional)
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - recnaile-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
-  feature2-service:
-    build: ./oauthService
-    container_name: oauthService
+  adminservice:
+    build: ./oauthservice
+    container_name: adminservices
     ports:
-      - "8080:8080"
+      - "8082:8082"
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
+      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/user-db?retryWrites=true&w=majority&appName=Recnaile
+      # Add these environment variables
+      SPRING_APPLICATION_NAME: auth-service
+      SERVER_PORT: 8082
+      # Allow all origins in development (optional)
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - recnaile-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
-  feature3-service:
+
+  productservice:
     build: ./productservice
-    container_name: productservice
+    container_name: productservices
     ports:
       - "8083:8083"
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/product-db?retryWrites=true&w=majority&appName=Recnaile
+      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/product-db?retryWrites=true&w=majority&appName=Recnaile
+    networks:
+      - recnaile-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+networks:
+  recnaile-network:
+    driver: bridge
+
+
+
+
+
 
 
 #
