@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 ##version: '3.8'
 ##
 ##services:
@@ -93,10 +93,8 @@
 
 
 
-=======
->>>>>>> 78a76189fc0def0faf5a6c777feacf2b7652812d
-version: '3.8'
 
+version: '3.8'
 services:
   authservice:
     build: ./authservice
@@ -156,18 +154,8 @@ services:
           memory: 1G
         reservations:
           memory: 512M
-<<<<<<< HEAD
-
-networks:
-  recnaile-network:
-    driver: bridge
 
 
-
-
-
-=======
->>>>>>> 78a76189fc0def0faf5a6c777feacf2b7652812d
 
 networks:
   recnaile-network:
