@@ -61,8 +61,8 @@
 
 package com.recnaile.oauthService.config;
 
-import com.recnaile.oauthService.security.CustomUserDetailsService;
-import com.recnaile.oauthService.security.JwtAuthFilter;
+import com.recnaile.authService.security.CustomUserDetailsService;
+import com.recnaile.authService.security.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
