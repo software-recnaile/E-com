@@ -1,4 +1,4 @@
-package com.recnaile.productService.config;
+package com.recnaile.accountService.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
