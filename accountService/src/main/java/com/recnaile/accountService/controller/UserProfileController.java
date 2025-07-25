@@ -48,6 +48,11 @@ public class UserProfileController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/")
+    public String display(){
+        return "Kimmy";
+    }
+
     @PostMapping("/{userId}/favorites/{productId}")
     public ResponseEntity<UserProfile> addFavoriteProduct(
             @PathVariable String userId,
