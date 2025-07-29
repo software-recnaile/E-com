@@ -160,4 +160,10 @@ public class AddressService {
             throw new IllegalArgumentException("Only one address can be set as default");
         }
     }
+    @PatchMapping("/user/{userId}/address/{addressId}/toggle-default")
+public ResponseEntity<UserAddresses> toggleDefaultAddress(
+        @PathVariable String userId,
+        @PathVariable String addressId) {
+    return ResponseEntity.ok(addressService.toggleDefaultAddress(userId, addressId));
+}
 }
