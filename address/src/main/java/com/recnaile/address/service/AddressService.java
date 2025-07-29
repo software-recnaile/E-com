@@ -160,10 +160,52 @@ public class AddressService {
             throw new IllegalArgumentException("Only one address can be set as default");
         }
     }
-    @PatchMapping("/user/{userId}/address/{addressId}/toggle-default")
-public ResponseEntity<UserAddresses> toggleDefaultAddress(
-        @PathVariable String userId,
-        @PathVariable String addressId) {
-    return ResponseEntity.ok(addressService.toggleDefaultAddress(userId, addressId));
+ @Transactional
+public UserAddresses toggleDefaultAddress(String userId, String addressId) {
+    // 1. Get user's address document
+    UserAddresses userAddresses = repository.findByUserId(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+    
+    // 2. Validate addresses exist
+    if (userAddresses.getAddresses() == null || userAddresses.getAddresses().isEmpty()) {
+        throw new ResourceNotFoundException("No addresses found for user");
+    }
+    
+    // 3. Find the target address
+    UserAddresses.Address targetAddress = userAddresses.getAddresses().stream()
+            .filter(addr -> addressId.equals(addr.getId()))
+            .findFirst()
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Address not found with ID: " + addressId));
+    
+    // 4. Check current status
+    boolean wasDefault = targetAddress.isDefault();
+    
+    // 5. If it was already default, find another address to make default
+    if (wasDefault) {
+        if (userAddresses.getAddresses().size() < 2) {
+            throw new IllegalStateException("Cannot unset default - user must have at least one default address");
+        }
+        
+        // Find first non-target address to make default
+        UserAddresses.Address newDefault = userAddresses.getAddresses().stream()
+                .filter(addr -> !addressId.equals(addr.getId()))
+                .findFirst()
+                .orElseThrow();
+        
+        // Update all addresses
+        userAddresses.getAddresses().forEach(addr -> {
+            addr.setDefault(addr.getId().equals(newDefault.getId()));
+        });
+    } 
+    // 6. If it wasn't default, make it the only default
+    else {
+        userAddresses.getAddresses().forEach(addr -> {
+            addr.setDefault(addr.getId().equals(addressId));
+        });
+    }
+    
+    // 7. Save and return
+    return repository.save(userAddresses);
 }
 }
