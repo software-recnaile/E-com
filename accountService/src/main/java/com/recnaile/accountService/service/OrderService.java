@@ -125,6 +125,9 @@ public class OrderService {
             throw new ResourceNotFoundException("Failed to fetch product details: " + e.getMessage());
         }
     }
+     public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
 
 
     public Order getOrderByNumber(String orderNumber, String userId) {
