@@ -75,5 +75,11 @@ public ResponseEntity<UserAddresses> toggleDefaultAddress(
         @PathVariable String addressId) {
     return ResponseEntity.ok(addressService.toggleDefaultAddress(userId, addressId));
 }
+    @GetMapping("/user/{userId}/address/{addressId}")
+public ResponseEntity<UserAddresses.Address> getAddressById(
+        @PathVariable String userId,
+        @PathVariable String addressId) {
+    return ResponseEntity.ok(addressService.getAddressById(userId, addressId));
+}
 
 }
