@@ -135,6 +135,7 @@ public class AddressService {
     public void deleteAllAddresses(String userId) {
         repository.deleteByUserId(userId);
     }
+    
 
     public UserAddresses setDefaultAddress(String userId, String addressId) {
         UserAddresses userAddresses = getUserAddresses(userId);
@@ -207,5 +208,22 @@ public UserAddresses toggleDefaultAddress(String userId, String addressId) {
     
     // 7. Save and return
     return repository.save(userAddresses);
+}
+    public UserAddresses.Address getAddressById(String userId, String addressId) {
+    // 1. Get the user's addresses
+    UserAddresses userAddresses = repository.findByUserId(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+    // 2. Validate the addresses list exists
+    if (userAddresses.getAddresses() == null || userAddresses.getAddresses().isEmpty()) {
+        throw new ResourceNotFoundException("No addresses found for user");
+    }
+
+    // 3. Find and return the specific address
+    return userAddresses.getAddresses().stream()
+            .filter(addr -> addressId.equals(addr.getId()))
+            .findFirst()
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Address not found with ID: " + addressId + " for user: " + userId));
 }
 }
