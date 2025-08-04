@@ -31,7 +31,7 @@ public class Cart {
         private int quantity;
 
         // Fields populated from product API
-        private transient String productId;
+        private  String productId;
         private transient String productName;
         private transient String productThumbnail;
         private transient double mrpRate;
@@ -40,4 +40,5 @@ public class Cart {
         private transient int availableStock;
         private transient List<String> productImages;
     }
+
 }
