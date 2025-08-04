@@ -368,37 +368,71 @@ public class AddressService {
         repository.deleteByUserId(userId);
     }
 
+    // @Transactional
+    // public UserAddresses toggleDefaultAddress(String userId, String addressId) {
+    //     UserAddresses userAddresses = getUserAddresses(userId);
+        
+    //     UserAddresses.Address targetAddress = userAddresses.getAddresses().stream()
+    //             .filter(addr -> addressId.equals(addr.getId()))
+    //             .findFirst()
+    //             .orElseThrow(() -> new ResourceNotFoundException(
+    //                 "Address not found with ID: " + addressId));
+        
+    //     if (targetAddress.isDefault()) {
+    //         if (userAddresses.getAddresses().size() == 1) {
+    //             throw new IllegalStateException("Cannot unset default - user must have at least one default address");
+    //         }
+            
+    //         // Find another address to make default
+    //         UserAddresses.Address newDefault = userAddresses.getAddresses().stream()
+    //                 .filter(addr -> !addressId.equals(addr.getId()))
+    //                 .findFirst()
+    //                 .orElseThrow();
+            
+    //         targetAddress.setDefault(false);
+    //         newDefault.setDefault(true);
+    //     } else {
+    //         // Make this address the only default
+    //         userAddresses.getAddresses().forEach(addr -> 
+    //             addr.setDefault(addr.getId().equals(addressId)));
+    //     }
+        
+    //     return repository.save(userAddresses);
+    // }
+
     @Transactional
-    public UserAddresses toggleDefaultAddress(String userId, String addressId) {
-        UserAddresses userAddresses = getUserAddresses(userId);
-        
-        UserAddresses.Address targetAddress = userAddresses.getAddresses().stream()
-                .filter(addr -> addressId.equals(addr.getId()))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException(
-                    "Address not found with ID: " + addressId));
-        
-        if (targetAddress.isDefault()) {
-            if (userAddresses.getAddresses().size() == 1) {
-                throw new IllegalStateException("Cannot unset default - user must have at least one default address");
-            }
-            
-            // Find another address to make default
-            UserAddresses.Address newDefault = userAddresses.getAddresses().stream()
-                    .filter(addr -> !addressId.equals(addr.getId()))
-                    .findFirst()
-                    .orElseThrow();
-            
-            targetAddress.setDefault(false);
-            newDefault.setDefault(true);
-        } else {
-            // Make this address the only default
-            userAddresses.getAddresses().forEach(addr -> 
-                addr.setDefault(addr.getId().equals(addressId)));
+public UserAddresses toggleDefaultAddress(String userId, String addressId) {
+    UserAddresses userAddresses = getUserAddresses(userId);
+    
+    UserAddresses.Address targetAddress = userAddresses.getAddresses().stream()
+            .filter(addr -> addressId.equals(addr.getId()))
+            .findFirst()
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Address not found with ID: " + addressId));
+    
+    if (targetAddress.isDefault()) {
+        if (userAddresses.getAddresses().size() == 1) {
+            throw new IllegalStateException("Cannot unset default - user must have at least one default address");
         }
         
-        return repository.save(userAddresses);
+        // Find another address to make default
+        UserAddresses.Address newDefault = userAddresses.getAddresses().stream()
+                .filter(addr -> !addressId.equals(addr.getId()))
+                .findFirst()
+                .orElseThrow();
+        
+        targetAddress.setDefault(false);
+        newDefault.setDefault(true);
+    } else {
+        // Make this address the only default
+        userAddresses.getAddresses().forEach(addr -> 
+            addr.setDefault(addr.getId().equals(addressId)));
     }
+    
+    return repository.save(userAddresses);
+}
+
+    
 
     public UserAddresses.Address getAddressById(String userId, String addressId) {
         UserAddresses userAddresses = getUserAddresses(userId);
@@ -422,3 +456,4 @@ public class AddressService {
         }
     }
 }
+
