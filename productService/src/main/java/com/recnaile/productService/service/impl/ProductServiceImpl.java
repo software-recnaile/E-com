@@ -324,7 +324,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-   @Override
+ @Override
 public ProductResponse updateStockByUniqueName(String uniqueName, Integer quantity) {
     Product product = productRepository.findByUniqueProductName(uniqueName)
             .orElseThrow(() -> new ProductNotFoundException("Product not found with unique name: " + uniqueName));
@@ -335,18 +335,10 @@ public ProductResponse updateStockByUniqueName(String uniqueName, Integer quanti
     Product updatedProduct = productRepository.save(product);
     return mapToProductResponse(updatedProduct);
 }
-
-      private void updateProductStock(String uniqueProductName, int quantityChange) {
-        try {
-            String url = PRODUCT_SERVICE_URL + "unique/" + uniqueProductName + "/stock?quantity=" + quantityChange;
-            restTemplate.patchForObject(url, null, ProductResponse.class);
-        } catch (Exception e) {
-            System.err.println("Failed to update product stock: " + e.getMessage());
-            // Handle error appropriately
-        }
     }
 
 
     
 }
+
 
