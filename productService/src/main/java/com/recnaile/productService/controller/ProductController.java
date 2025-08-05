@@ -273,4 +273,16 @@ public class ProductController {
         productService.deleteSingleImage(id, imageIndex);
         return ResponseEntity.noContent().build();
     }
+
+
+    // Update stock by unique product name
+@PatchMapping("/unique/{uniqueName}/stock")
+public ResponseEntity<ProductResponse> updateStockByUniqueName(
+        @PathVariable String uniqueName,
+        @RequestParam Integer quantity) {
+    ProductResponse response = productService.updateStockByUniqueName(uniqueName, quantity);
+    return ResponseEntity.ok(response);
+}
+
+    
 }
