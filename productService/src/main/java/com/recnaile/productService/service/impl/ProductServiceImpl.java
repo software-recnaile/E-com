@@ -30,6 +30,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private final Cloudinary cloudinary;
+     private static final String PRODUCT_SERVICE_URL = "https://product-service-4psw.onrender.com/api/products/";
+    
 
     @Override
     public ProductResponse createProduct(ProductDTO productDTO, MultipartFile[] images) throws IOException {
@@ -71,16 +73,7 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    private void updateProductStock(String uniqueProductName, int quantityChange) {
-    try {
-        String url = "https://product-service-4psw.onrender.com/api/products/unique/" + 
-                    uniqueProductName + "/stock?quantity=" + quantityChange;
-        restTemplate.patchForObject(url, null, ProductResponse.class);
-    } catch (Exception e) {
-        System.err.println("Failed to update product stock: " + e.getMessage());
-        // You might want to handle this differently based on your requirements
-    }
-}
+   
     
 
 
@@ -331,7 +324,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    @Override
+   @Override
 public ProductResponse updateStockByUniqueName(String uniqueName, Integer quantity) {
     Product product = productRepository.findByUniqueProductName(uniqueName)
             .orElseThrow(() -> new ProductNotFoundException("Product not found with unique name: " + uniqueName));
@@ -343,6 +336,17 @@ public ProductResponse updateStockByUniqueName(String uniqueName, Integer quanti
     return mapToProductResponse(updatedProduct);
 }
 
+      private void updateProductStock(String uniqueProductName, int quantityChange) {
+        try {
+            String url = PRODUCT_SERVICE_URL + "unique/" + uniqueProductName + "/stock?quantity=" + quantityChange;
+            restTemplate.patchForObject(url, null, ProductResponse.class);
+        } catch (Exception e) {
+            System.err.println("Failed to update product stock: " + e.getMessage());
+            // Handle error appropriately
+        }
+    }
+
 
     
 }
+
