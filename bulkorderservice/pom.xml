@@ -74,10 +74,7 @@
 			<version>v4-rev614-1.18.0-rc</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-data -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -140,3 +137,4 @@
 	</build>
 
 </project>
+
