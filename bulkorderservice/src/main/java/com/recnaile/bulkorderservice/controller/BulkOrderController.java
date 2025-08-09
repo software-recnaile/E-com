@@ -34,7 +34,7 @@ public class BulkOrderController {
     private ActivityLogService activityLogService;
 
     @PostMapping
-    @PermitAll
+   
     public ResponseEntity<String> submitBulkOrder(@RequestBody BulkOrderRequest request) {
         try {
             String referenceId = "BULK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -55,7 +55,7 @@ public class BulkOrderController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+   
     public ResponseEntity<List<BulkOrderDocument>> getAllOrders() {
         try {
             List<BulkOrderDocument> orders = googleSheetsService.getAllOrders();
@@ -66,7 +66,7 @@ public class BulkOrderController {
     }
 
     @GetMapping("/{referenceId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    
     public ResponseEntity<BulkOrderDocument> getOrderByReferenceId(@PathVariable String referenceId) {
         try {
             return googleSheetsService.getOrderByReferenceId(referenceId)
@@ -78,7 +78,7 @@ public class BulkOrderController {
     }
 
     @PatchMapping("/{referenceId}/process-status")
-    @PreAuthorize("hasRole('ADMIN')")
+    
     public ResponseEntity<BulkOrderDocument> updateProcessStatus(
             @PathVariable String referenceId,
             @RequestParam String status,
@@ -94,7 +94,7 @@ public class BulkOrderController {
     }
 
     @PatchMapping("/{referenceId}/payment-status")
-    @PreAuthorize("hasRole('ADMIN')")
+   
     public ResponseEntity<BulkOrderDocument> updatePaymentStatus(
             @PathVariable String referenceId,
             @RequestParam String status,
@@ -110,7 +110,7 @@ public class BulkOrderController {
     }
 
     @GetMapping("/{referenceId}/status-history")
-    @PreAuthorize("hasRole('ADMIN')")
+   
     public ResponseEntity<List<BulkOrderDocument.StatusHistoryEntry>> getStatusHistory(
             @PathVariable String referenceId) {
         BulkOrderDocument order = orderStatusService.getOrderByReferenceId(referenceId)
@@ -118,4 +118,5 @@ public class BulkOrderController {
 
         return ResponseEntity.ok(order.getStatusHistory());
     }
+
 }
