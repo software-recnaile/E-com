@@ -42,4 +42,10 @@ public class ActivityLogService {
             default: return "performed " + activityType;
         }
     }
+
+     public List<ActivityLogDocument> getAllLogs() {
+        return activityLogRepository.findAll();
+    }
+    
 }
+
