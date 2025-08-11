@@ -16,6 +16,14 @@ public class DronePlanController {
     @Autowired
     private DronePlanService dronePlanService;
 
+    @Autowired
+    private ActivityLogService activityLogService;
+
+    @GetMapping
+    public ResponseEntity<List<ActivityLogDocument>> getAllLogs() {
+        return ResponseEntity.ok(activityLogService.getAllLogs());
+    }
+
     @PostMapping
     public ResponseEntity<DronePlanDocument> create(@RequestBody DronePlanForm form) {
         return ResponseEntity.ok(dronePlanService.createDronePlan(form));
@@ -75,4 +83,5 @@ public class DronePlanController {
             @PathVariable DronePlanDocument.ProcessStatus status) {
         return ResponseEntity.ok(dronePlanService.getDronePlansByProcessStatus(status));
     }
+
 }
