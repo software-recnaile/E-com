@@ -1,0 +1,269 @@
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title th:text="${isConfirmation} ? 'Your Drone Plan Confirmation' : 'New Drone Plan Request'"></title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1 th:text="${isConfirmation} ? 'Thank you for your request!' : 'New Drone Plan Request'"></h1>-->
+
+<!--<p th:if="${isConfirmation}">-->
+<!--    We've received your custom drone plan request (Reference ID: <strong th:text="${referenceId}"></strong>).-->
+<!--    Our team will review your requirements and contact you shortly.-->
+<!--</p>-->
+
+<!--<h2>Request Details:</h2>-->
+<!--<table border="1" cellpadding="5">-->
+<!--    <tr>-->
+<!--        <td><strong>Reference ID</strong></td>-->
+<!--        <td th:text="${referenceId}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td><strong>Email</strong></td>-->
+<!--        <td th:text="${email}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td><strong>Drone Type</strong></td>-->
+<!--        <td th:text="${droneType}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td><strong>Requirements</strong></td>-->
+<!--        <td th:text="${requirements}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td><strong>Budget</strong></td>-->
+<!--        <td th:text="${budget}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td><strong>Timeline</strong></td>-->
+<!--        <td th:text="${timeline}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td><strong>Features</strong></td>-->
+<!--        <td>-->
+<!--            <ul th:each="feature : ${features}">-->
+<!--                <li th:text="${feature}"></li>-->
+<!--            </ul>-->
+<!--        </td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td><strong>Submitted At</strong></td>-->
+<!--        <td th:text="${submittedAt}"></td>-->
+<!--    </tr>-->
+<!--</table>-->
+
+<!--<p th:if="${isConfirmation}">-->
+<!--    If you have any questions, please reply to this email.-->
+<!--</p>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isConfirmation} ? 'Your Drone Plan Confirmation' : 'New Drone Plan Request'"></title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .details-table th {
+            text-align: left;
+            padding: 12px;
+            background-color: #f3f4f6;
+            color: var(--dark);
+        }
+
+        .details-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .features-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .feature-pill {
+            background-color: #e0e7ff;
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 14px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .logo {
+            height: 40px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+<!--        &lt;!&ndash; Replace with your logo URL &ndash;&gt;-->
+<!--        <img src="https://via.placeholder.com/150x50?t" alt="DroneTech Logo" class="logo">-->
+        <h1 th:text="${isConfirmation} ? 'Thank you for your request!' : 'New Drone Plan Request'"></h1>
+    </div>
+
+    <div class="content">
+        <div class="card">
+            <p th:if="${isConfirmation}">
+                We've received your custom drone plan request. Our team will review your requirements and contact you within 24 hours.
+            </p>
+            <p th:unless="${isConfirmation}">
+                A new drone plan request has been submitted and requires your review.
+            </p>
+
+            <div style="background: #f0fdf4; padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid var(--success);">
+                <strong>Reference ID:</strong> <span th:text="${referenceId}" style="font-family: monospace;"></span>
+            </div>
+        </div>
+
+        <h2 style="color: var(--primary); margin-top: 0;">Request Details</h2>
+
+        <table class="details-table">
+            <tr>
+                <th>Email</th>
+                <td th:text="${email}"></td>
+            </tr>
+            <tr>
+                <th>Drone Type</th>
+                <td>
+                    <span th:text="${droneType}" style="text-transform: capitalize;"></span>
+                    <span th:if="${droneType == 'photography'}" style="color: var(--accent); margin-left: 8px;">✈️</span>
+                    <span th:if="${droneType == 'agriculture'}" style="color: var(--success); margin-left: 8px;">🌱</span>
+                </td>
+            </tr>
+            <tr>
+                <th>Requirements</th>
+                <td th:text="${requirements}"></td>
+            </tr>
+            <tr>
+                <th>Budget</th>
+                <td>
+                    <span th:text="${budget}"></span>
+                    <span th:if="${budget == '5000+'}" style="color: var(--accent); margin-left: 8px;">💎</span>
+                </td>
+            </tr>
+            <tr>
+                <th>Timeline</th>
+                <td th:text="${timeline}"></td>
+            </tr>
+            <tr>
+                <th>Features</th>
+                <td>
+                    <div class="features-list">
+                        <span th:each="feature : ${features}" class="feature-pill" th:text="${feature}"></span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>Submitted At</th>
+                <td th:text="${submittedAt}"></td>
+            </tr>
+        </table>
+
+        <div th:if="${isConfirmation}" style="text-align: center; margin-top: 30px;">
+            <a href="mailto:support@dronetech.com" class="btn">Contact Support</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2023 DroneTech Solutions. All rights reserved.</p>
+        <p>123 Drone Street, Tech City, TC 12345</p>
+        <p>
+            <a href="https://dronetech.com" style="color: var(--primary); text-decoration: none;">Visit our website</a> |
+            <a href="tel:+1234567890" style="color: var(--primary); text-decoration: none;">Call us</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>
