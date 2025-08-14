@@ -14,8 +14,9 @@ public class ActivityLogDocument {
     private String id; // MongoDB will auto-generate ObjectId
 
     private String email;
-    private String username;
+    private String referenceId;
     private String activityType; // e.g. LOGIN, LOGOUT, PAYMENT_UPDATE
     private String description;
     private LocalDateTime timestamp;
 }
+
