@@ -21,17 +21,17 @@ public class ActivityLogService {
     @Autowired
     private ActivityLogRepository activityLogRepository;
 
-   public void log(String email, String username, String activityType, String status) {
+   public void log(String email, String referenceId, String activityType, String status) {
     ActivityLogDocument log = new ActivityLogDocument();
     log.setEmail(email);
-    log.setUsername(username);
+    log.setReferenceId(referenceId);  // Store referenceId in the document if needed
     log.setActivityType(activityType);
     log.setTimestamp(LocalDateTime.now());
 
     String formattedDate = log.getTimestamp()
             .format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a"));
     
-    String description = username + " (" + email + ") " 
+    String description = "Reference ID: " + referenceId + " (" + email + ") " 
             + getActivityDescription(activityType, status)
             + " at " + formattedDate;
     
@@ -55,4 +55,5 @@ public class ActivityLogService {
         default: return "performed " + activityType;
     }
 }
+
 
