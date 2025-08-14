@@ -21,24 +21,24 @@ public class ActivityLogService {
     @Autowired
     private ActivityLogRepository activityLogRepository;
 
-   public void log(String email, String referenceId, String activityType, String status) {
-    ActivityLogDocument log = new ActivityLogDocument();
-    log.setEmail(email);
-    log.setReferenceId(referenceId);  // Store referenceId in the document if needed
-    log.setActivityType(activityType);
-    log.setTimestamp(LocalDateTime.now());
+    public void log(String email, String referenceId, String activityType, String status) {
+        ActivityLogDocument log = new ActivityLogDocument();
+        log.setEmail(email);
+        log.setReferenceId(referenceId);  // Store referenceId in the document if needed
+        log.setActivityType(activityType);
+        log.setTimestamp(LocalDateTime.now());
 
-    String formattedDate = log.getTimestamp()
-            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a"));
-    
-    String description = "Reference ID: " + referenceId + " (" + email + ") " 
-            + getActivityDescription(activityType, status)
-            + " at " + formattedDate;
-    
-    log.setDescription(description);
+        String formattedDate = log.getTimestamp()
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a"));
 
-    activityLogMongoTemplate.save(log);
-}
+        String description = referenceId + " (" + email + ") "
+                + getActivityDescription(activityType, status)
+                + " at " + formattedDate;
+
+        log.setDescription(description);
+
+        activityLogMongoTemplate.save(log);
+    }
 
     public List<ActivityLogDocument> getAllLogs() {
         return activityLogRepository.findAll();
@@ -46,14 +46,20 @@ public class ActivityLogService {
 
 
     private String getActivityDescription(String activityType, String status) {
-    switch (activityType) {
-        case "LOGIN": return "logged in";
-        case "LOGOUT": return "logged out";
-        case "PAYMENT_UPDATE": return "changed payment status to " + status;
-        case "PROCESS_UPDATE": return "changed process status to " + status;
-        case "PLAN_CREATED": return "created a new plan";
-        default: return "performed " + activityType;
+        switch (activityType) {
+            case "LOGIN":
+                return "logged in";
+            case "LOGOUT":
+                return "logged out";
+            case "PAYMENT_UPDATE":
+                return "changed payment status to " + status;
+            case "PROCESS_UPDATE":
+                return "changed process status to " + status;
+            case "PLAN_CREATED":
+                return "created a new plan";
+            default:
+                return "performed " + activityType;
+        }
     }
+
 }
-
-
