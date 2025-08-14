@@ -56,7 +56,7 @@ public class DronePlanService {
         // activityLogService.log(form.getEmail(), referenceId, "PLAN_CREATED");
 
         activityLogService.log(form.getEmail(), referenceId, "PLAN_CREATED", "");
-        
+
         return savedDocument;
     }
 
@@ -112,26 +112,26 @@ public class DronePlanService {
     // }
 
     public DronePlanDocument updatePaymentStatus(String referenceId, DronePlanDocument.PaymentStatus status, String email) {
-    Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
-    return optionalDocument
-            .map(document -> {
-                document.setPaymentStatus(status);
-                activityLogService.log(email, referenceId, "PAYMENT_UPDATE", status.name());
-                return repository.save(document);
-            })
-            .orElse(null);
-}
+        Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
+        return optionalDocument
+                .map(document -> {
+                    document.setPaymentStatus(status);
+                    activityLogService.log(email, referenceId, "PAYMENT_UPDATE", status.name());
+                    return repository.save(document);
+                })
+                .orElse(null);
+    }
 
-public DronePlanDocument updateProcessStatus(String referenceId, DronePlanDocument.ProcessStatus status, String email) {
-    Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
-    return optionalDocument
-            .map(document -> {
-                document.setProcessStatus(status);
-                activityLogService.log(email, referenceId, "PROCESS_UPDATE", status.name());
-                return repository.save(document);
-            })
-            .orElse(null);
-}
+    public DronePlanDocument updateProcessStatus(String referenceId, DronePlanDocument.ProcessStatus status, String email) {
+        Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
+        return optionalDocument
+                .map(document -> {
+                    document.setProcessStatus(status);
+                    activityLogService.log(email, referenceId, "PROCESS_UPDATE", status.name());
+                    return repository.save(document);
+                })
+                .orElse(null);
+    }
 
     public List<DronePlanDocument> getDronePlansByPaymentStatus(DronePlanDocument.PaymentStatus status) {
         return repository.findByPaymentStatus(status);
@@ -145,5 +145,4 @@ public DronePlanDocument updateProcessStatus(String referenceId, DronePlanDocume
         return email != null && email.contains("@") ? email.substring(0, email.indexOf("@")) : email;
     }
 }
-
 
