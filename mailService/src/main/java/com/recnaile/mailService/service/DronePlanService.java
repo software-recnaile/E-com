@@ -53,8 +53,10 @@ public class DronePlanService {
         emailService.sendDronePlanEmail(form, referenceId, timestamp.toString(), true);
 
         // Log the action to activity-logs DB
-        activityLogService.log(form.getEmail(), referenceId, "PLAN_CREATED");
+        // activityLogService.log(form.getEmail(), referenceId, "PLAN_CREATED");
 
+        activityLogService.log(form.getEmail(), referenceId, "PLAN_CREATED", "");
+        
         return savedDocument;
     }
 
@@ -114,7 +116,7 @@ public class DronePlanService {
     return optionalDocument
             .map(document -> {
                 document.setPaymentStatus(status);
-                activityLogService.log(email, getUsernameFromEmail(email), "PAYMENT_UPDATE", status.name());
+                activityLogService.log(email, referenceId, "PAYMENT_UPDATE", status.name());
                 return repository.save(document);
             })
             .orElse(null);
@@ -125,7 +127,7 @@ public DronePlanDocument updateProcessStatus(String referenceId, DronePlanDocume
     return optionalDocument
             .map(document -> {
                 document.setProcessStatus(status);
-                activityLogService.log(email, getUsernameFromEmail(email), "PROCESS_UPDATE", status.name());
+                activityLogService.log(email, referenceId, "PROCESS_UPDATE", status.name());
                 return repository.save(document);
             })
             .orElse(null);
@@ -143,4 +145,5 @@ public DronePlanDocument updateProcessStatus(String referenceId, DronePlanDocume
         return email != null && email.contains("@") ? email.substring(0, email.indexOf("@")) : email;
     }
 }
+
 
