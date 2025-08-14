@@ -87,27 +87,49 @@ public class DronePlanService {
         }
     }
 
-    public DronePlanDocument updatePaymentStatus(String referenceId, DronePlanDocument.PaymentStatus status, String email) {
-        Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
-        return optionalDocument
-                .map(document -> {
-                    document.setPaymentStatus(status);
-                    activityLogService.log(email, getUsernameFromEmail(email), "PAYMENT_UPDATE");
-                    return repository.save(document);
-                })
-                .orElse(null);
-    }
+    // public DronePlanDocument updatePaymentStatus(String referenceId, DronePlanDocument.PaymentStatus status, String email) {
+    //     Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
+    //     return optionalDocument
+    //             .map(document -> {
+    //                 document.setPaymentStatus(status);
+    //                 activityLogService.log(email, getUsernameFromEmail(email), "PAYMENT_UPDATE");
+    //                 return repository.save(document);
+    //             })
+    //             .orElse(null);
+    // }
 
-    public DronePlanDocument updateProcessStatus(String referenceId, DronePlanDocument.ProcessStatus status, String email) {
-        Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
-        return optionalDocument
-                .map(document -> {
-                    document.setProcessStatus(status);
-                    activityLogService.log(email, getUsernameFromEmail(email), "PROCESS_UPDATE");
-                    return repository.save(document);
-                })
-                .orElse(null);
-    }
+    // public DronePlanDocument updateProcessStatus(String referenceId, DronePlanDocument.ProcessStatus status, String email) {
+    //     Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
+    //     return optionalDocument
+    //             .map(document -> {
+    //                 document.setProcessStatus(status);
+    //                 activityLogService.log(email, getUsernameFromEmail(email), "PROCESS_UPDATE");
+    //                 return repository.save(document);
+    //             })
+    //             .orElse(null);
+    // }
+
+    public DronePlanDocument updatePaymentStatus(String referenceId, DronePlanDocument.PaymentStatus status, String email) {
+    Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
+    return optionalDocument
+            .map(document -> {
+                document.setPaymentStatus(status);
+                activityLogService.log(email, getUsernameFromEmail(email), "PAYMENT_UPDATE", status.name());
+                return repository.save(document);
+            })
+            .orElse(null);
+}
+
+public DronePlanDocument updateProcessStatus(String referenceId, DronePlanDocument.ProcessStatus status, String email) {
+    Optional<DronePlanDocument> optionalDocument = Optional.ofNullable(repository.findByReferenceId(referenceId));
+    return optionalDocument
+            .map(document -> {
+                document.setProcessStatus(status);
+                activityLogService.log(email, getUsernameFromEmail(email), "PROCESS_UPDATE", status.name());
+                return repository.save(document);
+            })
+            .orElse(null);
+}
 
     public List<DronePlanDocument> getDronePlansByPaymentStatus(DronePlanDocument.PaymentStatus status) {
         return repository.findByPaymentStatus(status);
@@ -121,3 +143,4 @@ public class DronePlanService {
         return email != null && email.contains("@") ? email.substring(0, email.indexOf("@")) : email;
     }
 }
+
