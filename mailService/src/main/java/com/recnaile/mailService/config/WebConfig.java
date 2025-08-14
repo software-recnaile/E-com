@@ -9,15 +9,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-            .allowedOrigins("http://localhost:5173")
-                        .allowedOrigins("*") // Allow all origins (or specify your frontend URL)
+                        registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true)
-                        .maxAge(3600);  // Added if you need credentials
+                        .allowCredentials(false)
+                       
     }
 }
+
 
 
 
