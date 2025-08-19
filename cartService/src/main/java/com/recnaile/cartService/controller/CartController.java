@@ -53,4 +53,10 @@ public class CartController {
         cartService.clearCart(userId);
         return ResponseEntity.noContent().build();
     }
+
+    @Getting(/)
+    public String display{
+    return "Cart Service";
+    }
 }
+
