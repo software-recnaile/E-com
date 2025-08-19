@@ -54,11 +54,12 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(/)
+    @GetMapping("/")
     public String display(){
     return "Cart Service";
     }
 }
+
 
 
 
