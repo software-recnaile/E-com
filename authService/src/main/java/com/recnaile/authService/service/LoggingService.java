@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Service
 public class LoggingService {
-    private final UserActivityLogRepository logRepository;
+    // private final UserActivityLogRepository logRepository;
     private final MongoTemplate logsMongoTemplate;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
 
@@ -20,14 +20,14 @@ public class LoggingService {
     public LoggingService(
             UserActivityLogRepository logRepository,
             @Qualifier("logsMongoTemplate") MongoTemplate logsMongoTemplate) {
-        this.logRepository = logRepository;
+        // this.logRepository = logRepository;
         this.logsMongoTemplate = logsMongoTemplate;
     }
 
 
     public void logActivity(String email, String username, String activityType, String description) {
         UserActivityLog log = new UserActivityLog(email, username, activityType, description);
-        logRepository.save(log);
+        // logRepository.save(log);
         logsMongoTemplate.save(log, "user_activity_logs");
     }
 
@@ -50,4 +50,5 @@ public class LoggingService {
                 username, email, adminStatus, timestamp);
         logActivity(email, username, "ADMIN_CHANGE", description);
     }
+
 }
