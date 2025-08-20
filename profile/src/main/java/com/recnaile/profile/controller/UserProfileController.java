@@ -67,4 +67,10 @@ public class UserProfileController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @GetMapping("/")
+    public String display(){
+        return "Profile Service";
+    }
+
 }
