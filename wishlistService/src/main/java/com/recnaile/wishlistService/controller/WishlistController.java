@@ -44,4 +44,11 @@ public class WishlistController {
         wishlistService.clearWishlist(userId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/")
+    public String display(){
+        return "Wishlist service ";
+
+    }
 }
+
