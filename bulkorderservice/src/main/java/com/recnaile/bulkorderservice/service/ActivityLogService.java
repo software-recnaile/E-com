@@ -48,7 +48,7 @@ public class ActivityLogService {
         log.setActivityType(ActivityLog.ActivityType.PROCESS_STATUS_CHANGED);
         log.setReferenceId(referenceId);
         log.setUsername(email);
-        log.setDescription(email + " changed process status from " + oldStatus + " to " + newStatus + " for order " + referenceId);
+        log.setDescription(email + " changed process status  "  + newStatus + " for order " + referenceId);
         log.setOldValue(oldStatus);
         log.setNewValue(newStatus);
         log.setTimestamp(LocalDateTime.now());
@@ -61,3 +61,4 @@ public class ActivityLogService {
     }
 
 }
+
