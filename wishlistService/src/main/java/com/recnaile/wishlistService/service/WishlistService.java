@@ -23,34 +23,6 @@ public class WishlistService {
 
     private static final String PRODUCT_SERVICE_URL = "https://product-service-4psw.onrender.com/api/products/unique/";
 
-//    public Wishlist addToWishlist(String userId, String uniqueProductName) {
-//        // First verify the product exists
-//        ProductDTO product = fetchProductDetails(uniqueProductName);
-//        if (product == null) {
-//            throw new ResourceNotFoundException("Product not found with unique name: " + uniqueProductName);
-//        }
-//
-//        // Check if product already exists in wishlist
-//        if (wishlistRepository.existsByUserIdAndItemsUniqueProductName(userId, uniqueProductName)) {
-//            throw new IllegalArgumentException("Product already in wishlist");
-//        }
-//
-//        // Get or create wishlist
-//        Wishlist wishlist = wishlistRepository.findByUserId(userId)
-//                .orElseGet(() -> {
-//                    Wishlist newWishlist = new Wishlist();
-//                    newWishlist.setUserId(userId);
-//                    return newWishlist;
-//                });
-//
-//        // Add new item with basic info
-//        Wishlist.WishlistItem item = new Wishlist.WishlistItem();
-//        item.setUniqueProductName(uniqueProductName);
-//        wishlist.getItems().add(item);
-//
-//        return wishlistRepository.save(wishlist);
-//    }
-
     public Wishlist addToWishlist(String userId, String uniqueProductName) {
         // First verify the product exists and get its details
         ProductDTO product = fetchProductDetails(uniqueProductName);

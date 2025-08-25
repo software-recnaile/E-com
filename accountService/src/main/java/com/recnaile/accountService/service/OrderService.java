@@ -29,24 +29,6 @@ public class OrderService {
                             String shippingAddressId, String billingAddressId,
                             String paymentMethod) {
 
-        // Validate addresses belong to user
-//        if (!addressService.validateShippingAndBillingAddressIds(userId, shippingAddressId, billingAddressId)
-//) {
-//            throw new ResourceNotFoundException("Shipping address not found or doesn't belong to user");
-//        }
-//
-//        if (!addressService.verifyAddressBelongsToUser(userId, billingAddressId)) {
-//            throw new ResourceNotFoundException("Billing address not found or doesn't belong to user");
-//        }
-//
-//        // Verify at least one address is default
-//        if (!addressService.hasDefaultAddress(userId)) {
-//            throw new IllegalArgumentException("No default address found. Please set a default address before placing an order.");
-//        }
-
-        // Verify an address belongs to a user
-
-// This will return true for your example document
 
         // Create order items with product details
         List<Order.OrderItem> orderItems = items.stream()
