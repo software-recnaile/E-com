@@ -41,8 +41,8 @@ public class GoogleSheetsService {
     @Value("${google.sheets.spreadsheet.id}")
     private String spreadsheetId;
 
-    @Value("${google.sheets.credentials.file}")
-    private Resource credentialsFile;
+    // @Value("${google.sheets.credentials.file}")
+    // private Resource credentialsFile;
 
     @Value("${google.sheets.sheet.name:BulkOrders}")
     private String sheetName;
@@ -120,12 +120,19 @@ public class GoogleSheetsService {
                 .build();
     }
 
-    private GoogleCredentials getCredentials() throws IOException {
-        try (InputStream in = credentialsFile.getInputStream()) {
-            return GoogleCredentials.fromStream(in)
-                    .createScoped(SCOPES);
-        }
+  private GoogleCredentials getCredentials() throws IOException {
+    // google.sheets.credentials.json comes from application.properties -> Render env var
+    String credentialsJson = System.getenv("GOOGLE_CREDENTIALS");
+
+    if (credentialsJson == null || credentialsJson.isEmpty()) {
+        throw new IllegalStateException("GOOGLE_CREDENTIALS env variable is missing!");
     }
+
+    try (InputStream in = new ByteArrayInputStream(credentialsJson.getBytes(StandardCharsets.UTF_8))) {
+        return GoogleCredentials.fromStream(in).createScoped(SCOPES);
+    }
+}
+
 
     private void ensureSheetExists(Sheets sheetsService) throws IOException {
         Spreadsheet spreadsheet = sheetsService.spreadsheets().get(spreadsheetId).execute();
@@ -234,4 +241,5 @@ public class GoogleSheetsService {
                 "bulk_orders"
         );
     }
+
 }
