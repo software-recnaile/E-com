@@ -17,7 +17,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // Apply to all endpoints
                 .allowedOrigins("*")  // Allow all origins
-                .allowedOrigins("http://localhost:5173")
+             
                 .allowedMethods("*")  // Allow all HTTP methods
                 .allowedHeaders("*"); // Allow all headers
     }
@@ -35,4 +35,5 @@ public class CorsConfig implements WebMvcConfigurer {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
