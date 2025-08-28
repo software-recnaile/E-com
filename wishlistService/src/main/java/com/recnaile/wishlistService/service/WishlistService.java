@@ -21,7 +21,7 @@ public class WishlistService {
     private final WishlistRepository wishlistRepository;
     private final RestTemplate restTemplate;
 
-    private static final String PRODUCT_SERVICE_URL = "https://product-service-4psw.onrender.com/api/products/unique/";
+    private static final String PRODUCT_SERVICE_URL = "https://e-com-dlt7.onrender.com/api/products/unique/";
 
     public Wishlist addToWishlist(String userId, String uniqueProductName) {
         // First verify the product exists and get its details
@@ -175,6 +175,7 @@ public class WishlistService {
         item.setFinalPrice(product.getMrpRate() - product.getDiscountAmount());
         item.setProductImages(product.getImageUrls());
     }
+
 
 
 }
