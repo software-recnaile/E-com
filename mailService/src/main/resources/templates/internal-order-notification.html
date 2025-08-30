@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New Order Notification</title>
+</head>
+<body>
+<h1>New Order Received</h1>
+<p>Order Reference: <strong th:text="${orderRef}"></strong></p>
+
+<h2>Customer Details</h2>
+<p>Company: <span th:text="${order.companyInfo.name}"></span></p>
+<p>Contact: <span th:text="${order.contactInfo.person}"></span></p>
+<p>Email: <span th:text="${order.contactInfo.email}"></span></p>
+
+<p>Please find the complete order details attached.</p>
+</body>
+</html>
