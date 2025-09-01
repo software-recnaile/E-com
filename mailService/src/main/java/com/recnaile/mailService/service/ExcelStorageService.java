@@ -1,119 +1,128 @@
 package com.recnaile.mailService.service;
 
-import com.recnaile.mailService.model.BulkOrderRequest;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.*;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.recnaile.mailService.model.DronePlanForm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Date;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
-public class ExcelStorageService {
+public class GoogleSheetsService {
 
-    private final Path storagePath;
-    private final Object lock = new Object();
+    private static final String APPLICATION_NAME = "Mail Service";
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 
-    public ExcelStorageService(@Value("${excel.storage.path}") String storagePath) {
-        this.storagePath = Paths.get(storagePath);
+    @Value("${google.sheets.spreadsheet.id}")
+    private String spreadsheetId;
+
+    @Value("${google.sheets.sheet.name:Submissions}")
+    private String sheetName;
+
+    @Value("${GOOGLE_CREDENTIALS:}")
+    private String googleCredentialsJson;
+
+    private HttpRequestInitializer getCredentials() throws IOException {
+        if (googleCredentialsJson == null || googleCredentialsJson.trim().isEmpty()) {
+            throw new IOException("Google credentials not configured. Set GOOGLE_CREDENTIALS environment variable.");
+        }
+        
+        try (InputStream in = new ByteArrayInputStream(googleCredentialsJson.getBytes())) {
+            GoogleCredentials credentials = GoogleCredentials.fromStream(in)
+                    .createScoped(SCOPES);
+            return new HttpCredentialsAdapter(credentials);
+        }
+    }
+
+    private Sheets getSheetsService() throws IOException, GeneralSecurityException {
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials())
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+    }
+
+    public void saveDronePlan(DronePlanForm form, String referenceId, String timestamp) {
         try {
-            Files.createDirectories(this.storagePath);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not create storage directory", e);
+            Sheets sheetsService = getSheetsService();
+            ensureSheetExists(sheetsService);
+
+            List<List<Object>> values = prepareDronePlanRowData(form, referenceId, timestamp);
+            ValueRange body = new ValueRange()
+                    .setValues(values)
+                    .setMajorDimension("ROWS");
+
+            sheetsService.spreadsheets().values()
+                    .append(spreadsheetId, sheetName + "!A:A", body)
+                    .setValueInputOption("USER_ENTERED")
+                    .setInsertDataOption("INSERT_ROWS")
+                    .execute();
+
+        } catch (IOException | GeneralSecurityException e) {
+            throw new RuntimeException("Failed to save drone plan to Google Sheets", e);
         }
     }
 
-    public void appendToMasterExcel(BulkOrderRequest orderRequest) {
-        synchronized (lock) {
-            Path masterFile = storagePath.resolve("master_orders.xlsx");
+    private void ensureSheetExists(Sheets sheetsService) throws IOException {
+        Spreadsheet spreadsheet = sheetsService.spreadsheets().get(spreadsheetId).execute();
+        boolean sheetExists = spreadsheet.getSheets().stream()
+                .anyMatch(sheet -> sheet.getProperties().getTitle().equals(sheetName));
 
-            try (Workbook workbook = getOrCreateWorkbook(masterFile);
-                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-
-                // Get or create the "Orders" sheet
-                Sheet sheet = workbook.getSheet("Orders");
-                if (sheet == null) {
-                    sheet = workbook.createSheet("Orders");
-                    createHeaderRow(sheet);
-                }
-
-                // Append the new order data
-                appendOrderData(sheet, orderRequest);
-
-                // Save the workbook
-                workbook.write(outputStream);
-                Files.write(masterFile, outputStream.toByteArray(), StandardOpenOption.CREATE,
-                        StandardOpenOption.TRUNCATE_EXISTING);
-
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to update master Excel file", e);
-            }
+        if (!sheetExists) {
+            createNewSheetWithHeaders(sheetsService);
         }
     }
 
-    private Workbook getOrCreateWorkbook(Path file) throws IOException {
-        if (Files.exists(file)) {
-            try (InputStream inputStream = Files.newInputStream(file)) {
-                return new XSSFWorkbook(inputStream);
-            }
-        }
-        return new XSSFWorkbook();
+    private void createNewSheetWithHeaders(Sheets sheetsService) throws IOException {
+        AddSheetRequest addSheetRequest = new AddSheetRequest();
+        addSheetRequest.setProperties(new SheetProperties().setTitle(sheetName));
+
+        BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest();
+        batchUpdateRequest.setRequests(Collections.singletonList(
+                new Request().setAddSheet(addSheetRequest)
+        ));
+
+        sheetsService.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();
+
+        ValueRange headerBody = new ValueRange()
+                .setValues(Collections.singletonList(
+                        Arrays.asList(
+                                "Reference ID", "Timestamp", "Email", "Drone Type",
+                                "Requirements", "Features", "Budget", "Timeline"
+                        )
+                ));
+
+        sheetsService.spreadsheets().values()
+                .update(spreadsheetId, sheetName + "!A1", headerBody)
+                .setValueInputOption("USER_ENTERED")
+                .execute();
     }
 
-    private void createHeaderRow(Sheet sheet) {
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {
-                "Timestamp", "Order Reference", "Company Name", "Company Type", "Tax ID",
-                "Contact Person", "Email", "Phone", "Product Category", "Product Subcategory",
-                "Quantity", "Special Requirements", "Shipping Address", "Billing Address",
-                "Same as Shipping", "Payment Terms", "Additional Requirements", "Delivery Date"
-        };
-
-        for (int i = 0; i < headers.length; i++) {
-            headerRow.createCell(i).setCellValue(headers[i]);
-        }
-    }
-
-    private void appendOrderData(Sheet sheet, BulkOrderRequest orderRequest) {
-        for (BulkOrderRequest.Product product : orderRequest.getProducts()) {
-            Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-
-            int col = 0;
-            row.createCell(col++).setCellValue(new Date().toString());
-            row.createCell(col++).setCellValue(orderRequest.getOrderReference());
-            row.createCell(col++).setCellValue(orderRequest.getCompanyInfo().getName());
-            row.createCell(col++).setCellValue(orderRequest.getCompanyInfo().getType());
-            row.createCell(col++).setCellValue(orderRequest.getCompanyInfo().getTaxId());
-            row.createCell(col++).setCellValue(orderRequest.getContactInfo().getPerson());
-            row.createCell(col++).setCellValue(orderRequest.getContactInfo().getEmail());
-            row.createCell(col++).setCellValue(orderRequest.getContactInfo().getPhone());
-            row.createCell(col++).setCellValue(product.getCategory());
-            row.createCell(col++).setCellValue(product.getSubcategory());
-            row.createCell(col++).setCellValue(product.getQuantity());
-            row.createCell(col++).setCellValue(product.getSpecialRequirements());
-            row.createCell(col++).setCellValue(orderRequest.getShippingInfo().getShippingAddress());
-            row.createCell(col++).setCellValue(orderRequest.getShippingInfo().getBillingAddress());
-            row.createCell(col++).setCellValue(orderRequest.getShippingInfo().isSameAsShipping() ? "Yes" : "No");
-            row.createCell(col++).setCellValue(orderRequest.getPaymentTerms());
-            row.createCell(col++).setCellValue(orderRequest.getAdditionalRequirements());
-            row.createCell(col++).setCellValue(orderRequest.getDeliveryDate());
-        }
-    }
-
-    public byte[] getMasterExcel() throws IOException {
-        Path masterFile = storagePath.resolve("master_orders.xlsx");
-        if (Files.exists(masterFile)) {
-            return Files.readAllBytes(masterFile);
-        }
-        return new byte[0];
+    private List<List<Object>> prepareDronePlanRowData(DronePlanForm form, String referenceId, String timestamp) {
+        return Collections.singletonList(Arrays.asList(
+                referenceId,
+                timestamp,
+                form.getEmail(),
+                form.getDroneType(),
+                form.getRequirements(),
+                String.join(", ", form.getFeatures()),
+                form.getBudget(),
+                form.getTimeline()
+        ));
     }
 }
