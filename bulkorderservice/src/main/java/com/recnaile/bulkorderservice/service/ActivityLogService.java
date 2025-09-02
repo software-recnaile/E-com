@@ -36,7 +36,7 @@ public class ActivityLogService {
         log.setActivityType(ActivityLog.ActivityType.PAYMENT_STATUS_CHANGED);
         log.setReferenceId(referenceId);
         log.setUsername(email);
-        log.setDescription(email + " changed payment status from " + oldStatus + " to " + newStatus + " for order " + referenceId);
+        log.setDescription(email + " changed payment status  to " + newStatus + " for order " + referenceId);
         log.setOldValue(oldStatus);
         log.setNewValue(newStatus);
         log.setTimestamp(LocalDateTime.now());
@@ -48,7 +48,7 @@ public class ActivityLogService {
         log.setActivityType(ActivityLog.ActivityType.PROCESS_STATUS_CHANGED);
         log.setReferenceId(referenceId);
         log.setUsername(email);
-        log.setDescription(email + " changed process status from " + oldStatus + " to " + newStatus + " for order " + referenceId);
+        log.setDescription(email + " changed process status  to " + newStatus + " for order " + referenceId);
         log.setOldValue(oldStatus);
         log.setNewValue(newStatus);
         log.setTimestamp(LocalDateTime.now());
@@ -59,4 +59,5 @@ public class ActivityLogService {
         Query query = new Query();
         return activityMongoTemplate.find(query, ActivityLog.class, "bulk-order-logs");
     }
+
 }
