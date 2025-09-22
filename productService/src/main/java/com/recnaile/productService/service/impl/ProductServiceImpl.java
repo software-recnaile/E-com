@@ -226,16 +226,16 @@ public class ProductServiceImpl implements ProductService {
         return urls;
     }
 
-    private String uploadImage(MultipartFile file) throws IOException {
-        File uploadedFile = convertToFile(file);
-        Map uploadResult = cloudinary.uploader().upload(uploadedFile, ObjectUtils.emptyMap());
-        uploadedFile.delete();
+   private String uploadImage(MultipartFile file) throws IOException {
+    File uploadedFile = convertToFile(file);
+    Map uploadResult = cloudinary.uploader().upload(uploadedFile, ObjectUtils.emptyMap());
+    uploadedFile.delete();
 
-        if (uploadResult.get("url") == null) {
-            throw new IOException("Failed to upload image to Cloudinary");
-        }
-        return uploadResult.get("url").toString();
+    if (uploadResult.get("secure_url") == null) {
+        throw new IOException("Failed to upload image to Cloudinary");
     }
+    return uploadResult.get("secure_url").toString();  // ✅ always https
+}
 
     private void deleteImages(List<String> imageUrls) throws IOException {
         for (String url : imageUrls) {
@@ -328,4 +328,5 @@ public class ProductServiceImpl implements ProductService {
         Product updatedProduct = productRepository.save(product);
         return mapToProductResponse(updatedProduct);
     }
+
 }
