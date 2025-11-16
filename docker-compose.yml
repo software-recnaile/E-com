@@ -1,162 +1,138 @@
+version: "3.8"
 
-##version: '3.8'
-##
-##services:
-##  mongodb:
-##    image: mongo:6.0
-##    container_name: mongodb
-##    ports:
-##      - "27017:27017"
-##    environment:
-##      MONGO_INITDB_ROOT_USERNAME: root
-##      MONGO_INITDB_ROOT_PASSWORD: Ram#2123
-##    volumes:
-##      - mongodb_data:/data/db
-##
-##  feature1-service:
-##    build: ./Authservice
-##    container_name: authservice
-##    ports:
-##      - "8081:8081"
-####    depends_on:
-####      - mongodb
-###    environment:
-###      SPRING_DATA_MONGODB_URI: mongodb://root:Ram#2123@mongodb:27017/auth_db?authSource=admin
-##
-##  feature2-service:
-##    build: ./oauthService
-##    container_name: oauthService
-##    ports:
-##      - "8080:8080"
-##    depends_on:
-##      - mongodb
-##    environment:
-##      SPRING_DATA_MONGODB_URI: mongodb://root:Ram#2123@mongodb:27017/auth_db?authSource=admin
-##
-##volumes:
-##  mongodb_data:
-#
-#
-##version: '3.8'
-##
-##services:
-##  feature1-service:
-##    build: ./authservice
-##    container_name: authservice
-##    ports:
-##      - "8081:8081"
-##    environment:
-##      # Use your actual MongoDB Atlas URI here
-##      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
-##
-##  feature2-service:
-##    build: ./oauthService
-##    container_name: oauthService
-##    ports:
-##      - "8080:8080"
-##    environment:
-##      # Use your actual MongoDB Atlas URI here
-##      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
-#
-#
-
-
-
-#version: '3.8'
-#
-#services:
-#  feature1-service:
-#    build: ./authservice
-#    container_name: authservice
-#    ports:
-#      - "8081:8081"
-#    environment:
-#      # MongoDB Atlas connection URI with database auth-db
-#      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
-#
-##  feature2-service:
-##    build: ./oauthService
-##    container_name: oauthService
-##    ports:
-##      - "8082:8082"
-##    environment:
-##      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Recnaile
-#
-#  feature3-service:
-#    build: ./productservice
-#    container_name: productservice
-#    ports:
-#      - "8083:8083"
-#    environment:
-#      SPRING_DATA_MONGODB_URI: mongodb+srv://software:$Tech2025@recnaile.ffukcey.mongodb.net/product-db?retryWrites=true&w=majority&appName=Recnaile
-
-
-
-
-
-version: '3.8'
 services:
-  authservice:
-    build: ./authservice
-    container_name: authservices
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
     ports:
       - "8081:8081"
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/user-db?retryWrites=true&w=majority&appName=Recnaile
-      # Add these environment variables
-      SPRING_APPLICATION_NAME: auth-service
-      SERVER_PORT: 8081
-      # Allow all origins in development (optional)
-      SPRING_PROFILES_ACTIVE: dev
     networks:
-      - recnaile-network
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 512M
+      - micro_net
 
-  adminservice:
-    build: ./oauthservice
-    container_name: adminservices
+  account-service:
+    build:
+      context: ./account-service
+      dockerfile: Dockerfile
+    container_name: account-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
     ports:
-      - "8082:8082"
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/user-db?retryWrites=true&w=majority&appName=Recnaile
-      # Add these environment variables
-      SPRING_APPLICATION_NAME: auth-service
-      SERVER_PORT: 8082
-      # Allow all origins in development (optional)
-      SPRING_PROFILES_ACTIVE: dev
+      - "8084:8084"
     networks:
-      - recnaile-network
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 512M
+      - micro_net
 
-
-  productservice:
-    build: ./productservice
-    container_name: productservices
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
     ports:
       - "8083:8083"
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/product-db?retryWrites=true&w=majority&appName=Recnaile
     networks:
-      - recnaile-network
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 512M
+      - micro_net
 
+  cart-service:
+    build:
+      context: ./cart-service
+      dockerfile: Dockerfile
+    container_name: cart-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
+    ports:
+      - "8085:8085"
+    networks:
+      - micro_net
 
+  wishlist-service:
+    build:
+      context: ./wishlist-service
+      dockerfile: Dockerfile
+    container_name: wishlist-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
+    ports:
+      - "8087:8087"
+    networks:
+      - micro_net
+
+  profile-service:
+    build:
+      context: ./profile-service
+      dockerfile: Dockerfile
+    container_name: profile-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
+    # Profile-service also uses port 8084 internally → cannot map same host port
+    ports:
+      - "8086:8084"
+    networks:
+      - micro_net
+
+  bulkorder-service:
+    build:
+      context: ./bulkorder-service
+      dockerfile: Dockerfile
+    container_name: bulkorder-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
+    ports:
+      - "8091:8091"
+    networks:
+      - micro_net
+
+  address-service:
+    build:
+      context: ./address-service
+      dockerfile: Dockerfile
+    container_name: address-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
+    ports:
+      - "8089:8089"
+    networks:
+      - micro_net
+
+  mail-service:
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    container_name: mail-service
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=${MONGODB_URI}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+    ports:
+      - "8090:8090"
+    networks:
+      - micro_net
 
 networks:
-  recnaile-network:
+  micro_net:
     driver: bridge
