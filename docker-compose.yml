@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   # ----------------------
-  # Microservices (Docker Hub primary, Dockerfile fallback)
+  # Microservices
   # ----------------------
   authService:
     image: recnaile/auth-service:latest
@@ -164,7 +162,7 @@ services:
       - webproxy
 
   # ----------------------
-  # Nginx reverse proxy (exposes 80/443)
+  # Nginx reverse proxy
   # ----------------------
   nginx:
     image: nginx:1.25-alpine
@@ -194,11 +192,12 @@ services:
       - webproxy
 
   # ----------------------
-  # Certbot (letsencrypt) - runs only to create/renew certs using webroot
+  # Certbot (Let's Encrypt)
   # ----------------------
   certbot:
-    image: quay.io/letsencrypt/certbot:latest
+    image: certbot/certbot:latest
     container_name: certbot
+    restart: unless-stopped
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
