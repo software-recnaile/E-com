@@ -1,0 +1,123 @@
+name: Build, Push and Deploy
+
+on:
+  push:
+    branches: [ "dev" ]
+    paths:
+      - "authService/**"
+      - "accountService/**"
+      - "productService/**"
+      - "cartService/**"
+      - "wishlistService/**"
+      - "profile/**"
+      - "bulkorderservice/**"
+      - "address/**"
+      - "mailService/**"
+      - "oauthService/**"
+      - "nginx/**"
+      - "docker-compose.yml"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up QEMU (for cross-platform builds)
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build & Push authService
+      if: contains(toJson(github.event.commits), 'authService') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/auth-service:latest ./authService
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/auth-service:latest
+
+    - name: Build & Push accountService
+      if: contains(toJson(github.event.commits), 'accountService') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/account-service:latest ./accountService
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/account-service:latest
+
+    - name: Build & Push productService
+      if: contains(toJson(github.event.commits), 'productService') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/product-service:latest ./productService
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/product-service:latest
+
+    - name: Build & Push cartService
+      if: contains(toJson(github.event.commits), 'cartService') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/cart-service:latest ./cartService
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/cart-service:latest
+
+    - name: Build & Push wishlistService
+      if: contains(toJson(github.event.commits), 'wishlistService') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/wishlist-service:latest ./wishlistService
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/wishlist-service:latest
+
+    - name: Build & Push profile
+      if: contains(toJson(github.event.commits), 'profile') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/profile-service:latest ./profile
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/profile-service:latest
+
+    - name: Build & Push bulkorderservice
+      if: contains(toJson(github.event.commits), 'bulkorderservice') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bulkorder-service:latest ./bulkorderservice
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/bulkorder-service:latest
+
+    - name: Build & Push address
+      if: contains(toJson(github.event.commits), 'address') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/address-service:latest ./address
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/address-service:latest
+
+    - name: Build & Push mailService
+      if: contains(toJson(github.event.commits), 'mailService') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mail-service:latest ./mailService
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/mail-service:latest
+
+    - name: Build & Push oauthService
+      if: contains(toJson(github.event.commits), 'oauthService') || always()
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/oauth-service:latest ./oauthService
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/oauth-service:latest
+
+    - name: SSH to EC2 & Deploy
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ec2-51-20-66-14.eu-north-1.compute.amazonaws.com
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        script: |
+          set -e
+          cd ${REMOTE_APP_DIR:-/home/ubuntu/recnaile-app}
+          echo "Pulling latest images (best-effort)..."
+          docker pull recnaile/auth-service:latest || true
+          docker pull recnaile/account-service:latest || true
+          docker pull recnaile/product-service:latest || true
+          docker pull recnaile/cart-service:latest || true
+          docker pull recnaile/wishlist-service:latest || true
+          docker pull recnaile/profile-service:latest || true
+          docker pull recnaile/bulkorder-service:latest || true
+          docker pull recnaile/address-service:latest || true
+          docker pull recnaile/mail-service:latest || true
+          docker pull recnaile/oauth-service:latest || true
+
+          echo "Running rolling deploy..."
+          ./deploy_zero_downtime.sh || ./deploy.sh
