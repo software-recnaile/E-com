@@ -24,5 +24,6 @@ COPY src/main/resources/credentials.json /app/config/credentials.json
 #ENV GOOGLE_SHEETS_SPREADSHEET_ID=your-spreadsheet-id
 #ENV GOOGLE_SHEETS_SHEET_NAME=Submissions
 
-EXPOSE 8090
+EXPOSE 8089
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
