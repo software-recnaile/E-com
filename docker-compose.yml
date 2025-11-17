@@ -1,9 +1,15 @@
 version: "3.9"
 
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx
+  apache:
+    build: ./apache
+    container_name: apache
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./apache/conf:/usr/local/apache2/conf/extra
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - authservice
       - accountservice
@@ -14,14 +20,7 @@ services:
       - bulkorderservice
       - address
       - mailservice
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/proxy_params:/etc/nginx/proxy_params
-      - /etc/letsencrypt:/etc/letsencrypt
-    ports:
-      - "80:80"
-      - "443:443"
- networks:
+    networks:
       - recnaile-net
 
   authservice:
@@ -39,6 +38,7 @@ services:
       - "8082"
     networks:
       - recnaile-net
+
   productservice:
     build: ./productService
     container_name: productservice
@@ -60,7 +60,7 @@ services:
     container_name: wishlistservice
     expose:
       - "8085"
-  networks:
+    networks:
       - recnaile-net
 
   profile:
@@ -72,7 +72,7 @@ services:
       - recnaile-net
 
   bulkorderservice:
-    build: ./bulkorderservice
+    build: ./bulkOrderService
     container_name: bulkorderservice
     expose:
       - "8087"
@@ -83,7 +83,7 @@ services:
     build: ./address
     container_name: address
     expose:
-  - "8088"
+      - "8088"
     networks:
       - recnaile-net
 
