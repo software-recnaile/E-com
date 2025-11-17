@@ -71,8 +71,8 @@ services:
     networks:
       - recnaile-net
 
-  bulkorderservice:
-    build: ./bulkOrderService
+   bulkorderservice:
+    build: ./bulkorderservice
     container_name: bulkorderservice
     expose:
       - "8087"
