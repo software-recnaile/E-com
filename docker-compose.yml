@@ -16,19 +16,16 @@ services:
       - mailservice
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/proxy_params:/etc/nginx/proxy_params
       - /etc/letsencrypt:/etc/letsencrypt
     ports:
       - "80:80"
       - "443:443"
-    networks:
+ networks:
       - recnaile-net
 
   authservice:
-    build:
-      context: ./authService
-      args:
-        SERVICE_PORT: 8081
-    image: ecom-authservice
+    build: ./authService
     container_name: authservice
     expose:
       - "8081"
@@ -36,23 +33,14 @@ services:
       - recnaile-net
 
   accountservice:
-    build:
-      context: ./accountService
-      args:
-        SERVICE_PORT: 8082
-    image: ecom-accountservice
+    build: ./accountService
     container_name: accountservice
     expose:
       - "8082"
     networks:
       - recnaile-net
-
   productservice:
-    build:
-      context: ./productService
-      args:
-        SERVICE_PORT: 8083
-    image: ecom-productservice
+    build: ./productService
     container_name: productservice
     expose:
       - "8083"
@@ -60,11 +48,7 @@ services:
       - recnaile-net
 
   cartservice:
-    build:
-      context: ./cartService
-      args:
-        SERVICE_PORT: 8084
-    image: ecom-cartservice
+    build: ./cartService
     container_name: cartservice
     expose:
       - "8084"
@@ -72,23 +56,15 @@ services:
       - recnaile-net
 
   wishlistservice:
-    build:
-      context: ./wishlistService
-      args:
-        SERVICE_PORT: 8085
-    image: ecom-wishlistservice
+    build: ./wishlistService
     container_name: wishlistservice
     expose:
       - "8085"
-    networks:
+  networks:
       - recnaile-net
 
   profile:
-    build:
-      context: ./profile
-      args:
-        SERVICE_PORT: 8086
-    image: ecom-profile
+    build: ./profile
     container_name: profile
     expose:
       - "8086"
@@ -96,11 +72,7 @@ services:
       - recnaile-net
 
   bulkorderservice:
-    build:
-      context: ./bulkorderservice
-      args:
-        SERVICE_PORT: 8087
-    image: ecom-bulkorderservice
+    build: ./bulkorderservice
     container_name: bulkorderservice
     expose:
       - "8087"
@@ -108,23 +80,15 @@ services:
       - recnaile-net
 
   address:
-    build:
-      context: ./address
-      args:
-        SERVICE_PORT: 8088
-    image: ecom-address
+    build: ./address
     container_name: address
     expose:
-      - "8088"
+  - "8088"
     networks:
       - recnaile-net
 
   mailservice:
-    build:
-      context: ./mailService
-      args:
-        SERVICE_PORT: 8089
-    image: ecom-mailservice
+    build: ./mailService
     container_name: mailservice
     expose:
       - "8089"
