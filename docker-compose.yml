@@ -1,9 +1,6 @@
 version: "3.9"
 
 services:
-  # ===============================
-  # Reverse Proxy (Nginx + SSL)
-  # ===============================
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -25,82 +22,148 @@ services:
       - "443:443"
     networks:
       - recnaile-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
-  # ===============================
-  #      Microservices
-  # ===============================
+# ------------------------------
+# Microservices
+# ------------------------------
+authService:
+  build:
+    context: ./authService
+    args:
+      SERVICE_PORT: 8081
+  container_name: authService
+  expose:
+    - "8081"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
-  authService:
-    build: ./authService
-    container_name: authService
-    expose:
-      - "8081"
-    networks:
-      - recnaile-net
+accountService:
+  build:
+    context: ./accountService
+    args:
+      SERVICE_PORT: 8082
+  container_name: accountService
+  expose:
+    - "8082"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
-  accountService:
-    build: ./accountService
-    container_name: accountService
-    expose:
-      - "8082"
-    networks:
-      - recnaile-net
+productService:
+  build:
+    context: ./productService
+    args:
+      SERVICE_PORT: 8083
+  container_name: productService
+  expose:
+    - "8083"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
-  productService:
-    build: ./productService
-    container_name: productService
-    expose:
-      - "8083"
-    networks:
-      - recnaile-net
+cartService:
+  build:
+    context: ./cartService
+    args:
+      SERVICE_PORT: 8084
+  container_name: cartService
+  expose:
+    - "8084"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
-  cartService:
-    build: ./cartService
-    container_name: cartService
-    expose:
-      - "8084"
-    networks:
-      - recnaile-net
+wishlistService:
+  build:
+    context: ./wishlistService
+    args:
+      SERVICE_PORT: 8085
+  container_name: wishlistService
+  expose:
+    - "8085"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
-  wishlistService:
-    build: ./wishlistService
-    container_name: wishlistService
-    expose:
-      - "8085"
-    networks:
-      - recnaile-net
+profile:
+  build:
+    context: ./profile
+    args:
+      SERVICE_PORT: 8086
+  container_name: profile
+  expose:
+    - "8086"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
-  profile:
-    build: ./profile
-    container_name: profile
-    expose:
-      - "8086"
-    networks:
-      - recnaile-net
+bulkorderservice:
+  build:
+    context: ./bulkorderservice
+    args:
+      SERVICE_PORT: 8087
+  container_name: bulkorderservice
+  expose:
+    - "8087"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
-  bulkorderservice:
-    build: ./bulkorderservice
-    container_name: bulkorderservice
-    expose:
-      - "8087"
-    networks:
-      - recnaile-net
+address:
+  build:
+    context: ./address
+    args:
+      SERVICE_PORT: 8088
+  container_name: address
+  expose:
+    - "8088"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
-  address:
-    build: ./address
-    container_name: address
-    expose:
-      - "8088"
-    networks:
-      - recnaile-net
-
-  mailService:
-    build: ./mailService
-    container_name: mailService
-    expose:
-      - "8089"
-    networks:
-      - recnaile-net
+mailService:
+  build:
+    context: ./mailService
+    args:
+      SERVICE_PORT: 8089
+  container_name: mailService
+  expose:
+    - "8089"
+  networks:
+    - recnaile-net
+  deploy:
+    resources:
+      limits:
+        memory: 700M
 
 networks:
   recnaile-net:
