@@ -6,10 +6,8 @@ services:
     container_name: apache
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./apache/conf:/usr/local/apache2/conf/extra
-      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - authservice
       - accountservice
@@ -20,6 +18,8 @@ services:
       - bulkorderservice
       - address
       - mailservice
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
@@ -28,6 +28,8 @@ services:
     container_name: authservice
     expose:
       - "8081"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
@@ -36,6 +38,8 @@ services:
     container_name: accountservice
     expose:
       - "8082"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
@@ -44,6 +48,8 @@ services:
     container_name: productservice
     expose:
       - "8083"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
@@ -52,6 +58,8 @@ services:
     container_name: cartservice
     expose:
       - "8084"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
@@ -60,6 +68,8 @@ services:
     container_name: wishlistservice
     expose:
       - "8085"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
@@ -68,14 +78,18 @@ services:
     container_name: profile
     expose:
       - "8086"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
-   bulkorderservice:
+  bulkorderservice:
     build: ./bulkorderservice
     container_name: bulkorderservice
     expose:
       - "8087"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
@@ -84,6 +98,8 @@ services:
     container_name: address
     expose:
       - "8088"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
@@ -92,6 +108,8 @@ services:
     container_name: mailservice
     expose:
       - "8089"
+    environment:
+      - Tech2025=default_value
     networks:
       - recnaile-net
 
