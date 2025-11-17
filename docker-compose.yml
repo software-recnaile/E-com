@@ -1,511 +1,107 @@
-# services:
-#   # ----------------------
-#   # Microservices
-#   # ----------------------
-#   authService:
-#     image: recnaile/auth-service:latest
-#     build:
-#       context: ./authService
-#       dockerfile: Dockerfile
-#     container_name: authService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8081"
-#     healthcheck:
-#       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health || exit 1"]
-#       interval: 30s
-#       timeout: 5s
-#       retries: 3
-#     networks:
-#       - webproxy
-
-#   accountService:
-#     image: recnaile/account-service:latest
-#     build:
-#       context: ./accountService
-#       dockerfile: Dockerfile
-#     container_name: accountService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8082"
-#     networks:
-#       - webproxy
-
-#   productService:
-#     image: recnaile/product-service:latest
-#     build:
-#       context: ./productService
-#       dockerfile: Dockerfile
-#     container_name: productService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8083"
-#     networks:
-#       - webproxy
-
-#   cartService:
-#     image: recnaile/cart-service:latest
-#     build:
-#       context: ./cartService
-#       dockerfile: Dockerfile
-#     container_name: cartService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8084"
-#     networks:
-#       - webproxy
-
-#   wishlistService:
-#     image: recnaile/wishlist-service:latest
-#     build:
-#       context: ./wishlistService
-#       dockerfile: Dockerfile
-#     container_name: wishlistService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8085"
-#     networks:
-#       - webproxy
-
-#   profile:
-#     image: recnaile/profile-service:latest
-#     build:
-#       context: ./profile
-#       dockerfile: Dockerfile
-#     container_name: profileService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8086"
-#     networks:
-#       - webproxy
-
-#   bulkorderservice:
-#     image: recnaile/bulkorder-service:latest
-#     build:
-#       context: ./bulkorderservice
-#       dockerfile: Dockerfile
-#     container_name: bulkorderService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8087"
-#     networks:
-#       - webproxy
-
-#   address:
-#     image: recnaile/address-service:latest
-#     build:
-#       context: ./address
-#       dockerfile: Dockerfile
-#     container_name: addressService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8088"
-#     networks:
-#       - webproxy
-
-#   mailService:
-#     image: recnaile/mail-service:latest
-#     build:
-#       context: ./mailService
-#       dockerfile: Dockerfile
-#     container_name: mailService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#       - SMTP_HOST=${SMTP_HOST}
-#       - SMTP_PORT=${SMTP_PORT}
-#       - SMTP_USER=${SMTP_USER}
-#       - SMTP_PASS=${SMTP_PASS}
-#     expose:
-#       - "8089"
-#     networks:
-#       - webproxy
-
-#   oauthService:
-#     image: recnaile/oauth-service:latest
-#     build:
-#       context: ./oauthService
-#       dockerfile: Dockerfile
-#     container_name: oauthService
-#     restart: unless-stopped
-#     environment:
-#       - SPRING_PROFILES_ACTIVE=prod
-#       - MONGODB_URI=${MONGODB_URI}
-#     expose:
-#       - "8090"
-#     networks:
-#       - webproxy
-
-#   # ----------------------
-#   # Nginx reverse proxy
-#   # ----------------------
-#   nginx:
-#     image: nginx:1.25-alpine
-#     container_name: nginx-proxy
-#     restart: unless-stopped
-#     ports:
-#       - "80:80"
-#       - "443:443"
-#     volumes:
-#       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-#       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-#       - ./certbot/www:/var/www/certbot
-#       - ./certbot/conf:/etc/letsencrypt
-#       - /var/log/nginx:/var/log/nginx
-#     depends_on:
-#       - authService
-#       - accountService
-#       - productService
-#       - cartService
-#       - wishlistService
-#       - profile
-#       - bulkorderservice
-#       - address
-#       - mailService
-#       - oauthService
-#     networks:
-#       - webproxy
-
-#   # ----------------------
-#   # Certbot (Let's Encrypt)
-#   # ----------------------
-#   certbot:
-#     image: certbot/certbot:latest
-#     container_name: certbot
-#     restart: unless-stopped
-#     volumes:
-#       - ./certbot/www:/var/www/certbot
-#       - ./certbot/conf:/etc/letsencrypt
-#     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; done'"
-#     networks:
-#       - webproxy
-
-# networks:
-#   webproxy:
-#     driver: bridge
-
-
-
-
-
-
-
-
+version: "3.9"
 
 services:
-  # ----------------------
-  # Microservices (Sequential Startup)
-  # ----------------------
-  authService:
-    image: recnaile/auth-service:latest
-    build:
-      context: ./authService
-      dockerfile: Dockerfile
-    container_name: authService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8081"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  accountService:
-    image: recnaile/account-service:latest
-    build:
-      context: ./accountService
-      dockerfile: Dockerfile
-    container_name: accountService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8082"
-    depends_on:
-      authService:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  productService:
-    image: recnaile/product-service:latest
-    build:
-      context: ./productService
-      dockerfile: Dockerfile
-    container_name: productService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8083"
-    depends_on:
-      accountService:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  cartService:
-    image: recnaile/cart-service:latest
-    build:
-      context: ./cartService
-      dockerfile: Dockerfile
-    container_name: cartService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8084"
-    depends_on:
-      productService:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  wishlistService:
-    image: recnaile/wishlist-service:latest
-    build:
-      context: ./wishlistService
-      dockerfile: Dockerfile
-    container_name: wishlistService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8085"
-    depends_on:
-      cartService:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  profile:
-    image: recnaile/profile-service:latest
-    build:
-      context: ./profile
-      dockerfile: Dockerfile
-    container_name: profileService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8086"
-    depends_on:
-      wishlistService:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8086/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  bulkorderservice:
-    image: recnaile/bulkorder-service:latest
-    build:
-      context: ./bulkorderservice
-      dockerfile: Dockerfile
-    container_name: bulkorderService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8087"
-    depends_on:
-      profile:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8087/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  address:
-    image: recnaile/address-service:latest
-    build:
-      context: ./address
-      dockerfile: Dockerfile
-    container_name: addressService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8088"
-    depends_on:
-      bulkorderservice:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8088/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  mailService:
-    image: recnaile/mail-service:latest
-    build:
-      context: ./mailService
-      dockerfile: Dockerfile
-    container_name: mailService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASS=${SMTP_PASS}
-    expose:
-      - "8089"
-    depends_on:
-      address:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8089/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  oauthService:
-    image: recnaile/oauth-service:latest
-    build:
-      context: ./oauthService
-      dockerfile: Dockerfile
-    container_name: oauthService
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MONGODB_URI=${MONGODB_URI}
-    expose:
-      - "8090"
-    depends_on:
-      mailService:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    networks:
-      - webproxy
-
-  # ----------------------
-  # Nginx reverse proxy (starts after all services healthy)
-  # ----------------------
+  # ===============================
+  # Reverse Proxy (Nginx + SSL)
+  # ===============================
   nginx:
-    image: nginx:1.25-alpine
-    container_name: nginx-proxy
-    restart: unless-stopped
+    image: nginx:latest
+    container_name: nginx
+    depends_on:
+      - authService
+      - accountService
+      - productService
+      - cartService
+      - wishlistService
+      - profile
+      - bulkorderservice
+      - address
+      - mailService
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-      - /var/log/nginx:/var/log/nginx
-    depends_on:
-      authService:
-        condition: service_healthy
-      accountService:
-        condition: service_healthy
-      productService:
-        condition: service_healthy
-      cartService:
-        condition: service_healthy
-      wishlistService:
-        condition: service_healthy
-      profile:
-        condition: service_healthy
-      bulkorderservice:
-        condition: service_healthy
-      address:
-        condition: service_healthy
-      mailService:
-        condition: service_healthy
-      oauthService:
-        condition: service_healthy
     networks:
-      - webproxy
+      - recnaile-net
 
-  # ----------------------
-  # Certbot (Let's Encrypt)
-  # ----------------------
-  certbot:
-    image: certbot/certbot:latest
-    container_name: certbot
-    restart: unless-stopped
-    volumes:
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; done'"
+  # ===============================
+  #      Microservices
+  # ===============================
+
+  authService:
+    build: ./authService
+    container_name: authService
+    expose:
+      - "8081"
     networks:
-      - webproxy
+      - recnaile-net
+
+  accountService:
+    build: ./accountService
+    container_name: accountService
+    expose:
+      - "8082"
+    networks:
+      - recnaile-net
+
+  productService:
+    build: ./productService
+    container_name: productService
+    expose:
+      - "8083"
+    networks:
+      - recnaile-net
+
+  cartService:
+    build: ./cartService
+    container_name: cartService
+    expose:
+      - "8084"
+    networks:
+      - recnaile-net
+
+  wishlistService:
+    build: ./wishlistService
+    container_name: wishlistService
+    expose:
+      - "8085"
+    networks:
+      - recnaile-net
+
+  profile:
+    build: ./profile
+    container_name: profile
+    expose:
+      - "8086"
+    networks:
+      - recnaile-net
+
+  bulkorderservice:
+    build: ./bulkorderservice
+    container_name: bulkorderservice
+    expose:
+      - "8087"
+    networks:
+      - recnaile-net
+
+  address:
+    build: ./address
+    container_name: address
+    expose:
+      - "8088"
+    networks:
+      - recnaile-net
+
+  mailService:
+    build: ./mailService
+    container_name: mailService
+    expose:
+      - "8089"
+    networks:
+      - recnaile-net
 
 networks:
-  webproxy:
+  recnaile-net:
     driver: bridge
