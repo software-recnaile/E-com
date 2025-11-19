@@ -22,7 +22,7 @@ public class OrderService {
 
     
 
-    private static final String PRODUCT_SERVICE_URL = "https://e-com-dlt7.onrender.com/api/products/unique/";
+    private static final String PRODUCT_SERVICE_URL = "http://api.recnaile.com/api/products/unique/";
 
 
     public Order placeOrder(String userId, List<OrderRequest.Item> items,
@@ -147,4 +147,5 @@ public class OrderService {
 
 
 }
+
 
