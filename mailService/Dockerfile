@@ -21,7 +21,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 RUN mkdir -p /app/config
-COPY src/main/resources/credentials.json /app/config/credentials.json
+COPY docker/credentials.json /app/config/credentials.json
 
 
 # Expose the service port (replace accordingly)
@@ -32,5 +32,6 @@ EXPOSE ${SERVICE_PORT}
 ENV JAVA_OPTS="-Xmx700m -Xms512m -XX:+UseG1GC"
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+
 
 
