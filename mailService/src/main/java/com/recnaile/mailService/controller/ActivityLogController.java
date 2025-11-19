@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/activity-logs")
+@RequestMapping("/api/mail-activity-logs")
 public class ActivityLogController {
 
     @Autowired
@@ -34,4 +34,5 @@ public class ActivityLogController {
     public ResponseEntity<List<ActivityLogDocument>> getLogsByActivityType(@PathVariable String activityType) {
         return ResponseEntity.ok(activityLogService.getLogsByActivityType(activityType));
     }
+
 }
