@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/activity-logs")
+@RequestMapping("/api/bulkorder-activity-logs")
 public class ActivityLogController {
 
     @Autowired
@@ -20,4 +20,5 @@ public class ActivityLogController {
     public List<ActivityLog> getAllActivityLogs() {
         return activityLogService.getAllLogs();
     }
+
 }
