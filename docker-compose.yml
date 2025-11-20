@@ -5,9 +5,15 @@ services:
     build: ./apache
     container_name: apache
     ports:
-      - "80:80"
+      - "80:80"     # HTTP → Redirects to HTTPS
+      - "443:443"   # HTTPS main site
     volumes:
-      - ./apache/conf:/usr/local/apache2/conf/extra
+      # Mount your Apache config
+      - ./apache/conf:/usr/local/apache2/conf/extra:ro
+
+      # Mount Let's Encrypt certs from host → container (required for SSL)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+
     depends_on:
       - authservice
       - accountservice
@@ -18,8 +24,10 @@ services:
       - bulkorderservice
       - address
       - mailservice
+
     environment:
       - Tech2025=default_value
+
     networks:
       - recnaile-net
 
