@@ -20,7 +20,7 @@ public class CartService {
     private final CartRepository cartRepository;
     private final RestTemplate restTemplate;
 
-    private static final String PRODUCT_SERVICE_URL = "http://api.recnaile.com/api/products/unique/";
+    private static final String PRODUCT_SERVICE_URL = "https://api.recnaile.com/api/products/unique/";
 
     public Cart addToCart(String userId, String uniqueProductName, int quantity) {
         // Validate input
@@ -180,5 +180,6 @@ public class CartService {
     }
 
 }
+
 
 
