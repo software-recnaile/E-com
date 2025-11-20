@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   apache:
     build: ./apache
@@ -21,12 +19,12 @@ services:
       - cartservice
       - wishlistservice
       - profile
-      - bulkorderservice
+      - bulk-order-service
       - address
       - mailservice
 
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
 
     networks:
       - recnaile-net
@@ -37,7 +35,7 @@ services:
     expose:
       - "8081"
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
     networks:
       - recnaile-net
 
@@ -47,7 +45,7 @@ services:
     expose:
       - "8082"
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
     networks:
       - recnaile-net
 
@@ -57,7 +55,7 @@ services:
     expose:
       - "8083"
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
     networks:
       - recnaile-net
 
@@ -67,7 +65,7 @@ services:
     expose:
       - "8084"
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
     networks:
       - recnaile-net
 
@@ -77,7 +75,7 @@ services:
     expose:
       - "8085"
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
     networks:
       - recnaile-net
 
@@ -87,17 +85,29 @@ services:
     expose:
       - "8086"
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
     networks:
       - recnaile-net
 
-  bulkorderservice:
+  bulk-order-service:
     build: ./bulkorderservice
     container_name: bulkorderservice
-    expose:
-      - "8087"
+    ports:
+      - "8087:8087"
     environment:
-      - Tech2025=default_value
+      - GOOGLE_SHEETS_SPREADSHEET_ID=152ptNLn-Ir4pjSE9taj7Ddw8yGcTEnILryvvAXcW4HA
+      - GOOGLE_SHEETS_SHEET_NAME=BulkOrders
+      - SPRING_DATA_ADMIN_MONGODB_URI=mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/admin-db?retryWrites=true&w=majority&appName=Recnaile
+      - SPRING_DATA_ACCOUNT_MONGODB_URI=mongodb+srv://software:%24Tech2025@recnaile.ffukcey.mongodb.net/account-db?retryWrites=true&w=majority&appName=Recnaile
+      - Tech2025=${Tech2025}
+    volumes:
+      - ./docker/credentials.json:/app/config/credentials.json:ro  # Use shared docker credentials
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8087/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - recnaile-net
 
@@ -107,17 +117,27 @@ services:
     expose:
       - "8088"
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
     networks:
       - recnaile-net
 
   mailservice:
     build: ./mailService
     container_name: mailservice
-    expose:
-      - "8089"
+    ports:
+      - "8890:8089"
     environment:
-      - Tech2025=default_value
+      - Tech2025=${Tech2025}
+      - GOOGLE_SHEETS_SPREADSHEET_ID=16lsEGCi6AqKWiqpBdz2FZwHk99eBAZnwS_Lv3P1NTgw
+      - GOOGLE_SHEETS_SHEET_NAME=Customization
+    volumes:
+      - ./docker/credentials.json:/app/config/credentials.json:ro  # Use shared docker credentials
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8089/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - recnaile-net
 
