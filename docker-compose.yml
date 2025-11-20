@@ -3,7 +3,7 @@ services:
     build: ./apache
     container_name: apache
     ports:
-      - "80:80"     # HTTP → Redirects to HTTPS
+      - "8080:80"     # HTTP → Redirects to HTTPS
       - "443:443"   # HTTPS main site
     volumes:
       # Mount your Apache config
