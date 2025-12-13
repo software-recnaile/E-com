@@ -161,9 +161,43 @@ public class GoogleSheetsService {
 
     private String getCredentialsFromFile() {
         try {
-            log.info("Attempting to load Google credentials from file...");
+            log.info("Attempting to load Google credentials...");
 
-            // Priority 1: Try the configured file path from application.properties
+            // Priority 1: Try classpath resource first (for manual/local development)
+            log.info("Checking classpath for credentials.json");
+            Resource resource = new ClassPathResource("credentials.json");
+            if (resource.exists()) {
+                try (InputStream is = resource.getInputStream()) {
+                    String content = new String(is.readAllBytes());
+                    if (content != null && !content.trim().isEmpty()) {
+                        log.info("✅ Successfully loaded credentials from classpath: credentials.json ({} bytes)",
+                                content.length());
+                        return content;
+                    } else {
+                        log.warn("Classpath credentials file is empty");
+                    }
+                }
+            } else {
+                log.warn("Classpath credentials file not found");
+            }
+
+            // Priority 2: Try relative path for development
+            Path devPath = Paths.get("src/main/resources/credentials.json");
+            log.info("Checking development path: {}", devPath.toAbsolutePath());
+            if (Files.exists(devPath)) {
+                String content = Files.readString(devPath);
+                if (content != null && !content.trim().isEmpty()) {
+                    log.info("✅ Successfully loaded credentials from dev path: {} ({} bytes)",
+                            devPath.toAbsolutePath(), content.length());
+                    return content;
+                } else {
+                    log.warn("Dev credentials file is empty: {}", devPath.toAbsolutePath());
+                }
+            } else {
+                log.warn("Dev credentials file not found: {}", devPath.toAbsolutePath());
+            }
+
+            // Priority 3: Try the configured file path
             if (credentialsFile != null && !credentialsFile.trim().isEmpty()) {
                 String filePath = credentialsFile.replace("file:", "").trim();
                 Path path = Paths.get(filePath);
@@ -183,41 +217,7 @@ public class GoogleSheetsService {
                 }
             }
 
-            // Priority 2: Try default Docker location
-            Path dockerPath = Paths.get("/app/config/credentials.json");
-            log.info("Checking Docker default location: {}", dockerPath);
-            if (Files.exists(dockerPath)) {
-                String content = Files.readString(dockerPath);
-                if (content != null && !content.trim().isEmpty()) {
-                    log.info("✅ Successfully loaded credentials from Docker location: {} ({} bytes)",
-                            dockerPath, content.length());
-                    return content;
-                } else {
-                    log.warn("Docker credentials file is empty: {}", dockerPath);
-                }
-            } else {
-                log.warn("Docker credentials file not found: {}", dockerPath);
-            }
-
-            // Priority 3: Try classpath resource as last resort
-            log.info("Checking classpath for credentials.json");
-            Resource resource = new ClassPathResource("credentials.json");
-            if (resource.exists()) {
-                try (InputStream is = resource.getInputStream()) {
-                    String content = new String(is.readAllBytes());
-                    if (content != null && !content.trim().isEmpty()) {
-                        log.info("✅ Successfully loaded credentials from classpath: credentials.json ({} bytes)",
-                                content.length());
-                        return content;
-                    } else {
-                        log.warn("Classpath credentials file is empty");
-                    }
-                }
-            } else {
-                log.warn("Classpath credentials file not found");
-            }
-
-            // Priority 4: Try environment variable as final fallback (for backward compatibility)
+            // Priority 4: Try environment variable
             String envCreds = getCredentialsFromEnvironment();
             if (envCreds != null && !envCreds.trim().isEmpty()) {
                 log.info("✅ Successfully loaded credentials from environment variable ({} bytes)",
@@ -226,7 +226,7 @@ public class GoogleSheetsService {
             }
 
         } catch (Exception e) {
-            log.error("❌ Failed to read credentials from file", e);
+            log.error("❌ Failed to read credentials", e);
         }
 
         log.error("❌ No credentials found in any location");
