@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -42,16 +44,19 @@ public class GoogleSheetsService {
     private final String sheetName;
     private final String credentialsFile;
     private final Environment env;
+    private final ResourceLoader resourceLoader;
 
     public GoogleSheetsService(
             @Value("${google.sheets.spreadsheet.id}") String spreadsheetId,
             @Value("${google.sheets.sheet.name:Submissions}") String sheetName,
             @Value("${google.sheets.credentials.file}") String credentialsFile,
-            Environment env) {
+            Environment env,
+            ResourceLoader resourceLoader) {
         this.spreadsheetId = spreadsheetId;
         this.sheetName = sheetName;
         this.credentialsFile = credentialsFile;
         this.env = env;
+        this.resourceLoader = resourceLoader;
         logger.info("GoogleSheetsService initialized with spreadsheet: {}, sheet: {}, credentials file: {}",
                 spreadsheetId, sheetName, credentialsFile);
     }
@@ -60,8 +65,7 @@ public class GoogleSheetsService {
         String credentialsJson = getCredentialsFromFile();
 
         if (credentialsJson == null || credentialsJson.trim().isEmpty()) {
-            String errorMsg = "Google credentials not found in file: " + credentialsFile +
-                    ". Please ensure credentials.json is mounted to /app/config/credentials.json";
+            String errorMsg = "Google credentials not found. Please ensure credentials.json is available.";
             logger.error(errorMsg);
             throw new IOException(errorMsg);
         }
@@ -71,75 +75,69 @@ public class GoogleSheetsService {
 
     private String getCredentialsFromFile() {
         try {
-            logger.info("Attempting to load Google credentials from file...");
+            logger.info("Attempting to load Google credentials from: {}", credentialsFile);
 
-            // Priority 1: Try the configured file path from application.properties
+            // Handle classpath resources
+            if (credentialsFile != null && credentialsFile.startsWith("classpath:")) {
+                String classpathLocation = credentialsFile.substring("classpath:".length());
+                return loadFromClasspath(classpathLocation);
+            }
+
+            // Handle file paths
+            if (credentialsFile != null && credentialsFile.startsWith("file:")) {
+                String filePath = credentialsFile.substring("file:".length()).trim();
+                return loadFromFilePath(filePath);
+            }
+
+            // Try as regular file path
             if (credentialsFile != null && !credentialsFile.trim().isEmpty()) {
-                String filePath = credentialsFile.replace("file:", "").trim();
-                Path path = Paths.get(filePath);
-                logger.info("Checking configured credentials file: {}", path.toAbsolutePath());
-
-                if (Files.exists(path)) {
-                    String content = Files.readString(path);
-                    if (content != null && !content.trim().isEmpty()) {
-                        logger.info("✅ Successfully loaded credentials from configured file: {} ({} bytes)",
-                                path.toAbsolutePath(), content.length());
-                        return content;
-                    } else {
-                        logger.warn("Configured credentials file is empty: {}", path.toAbsolutePath());
-                    }
-                } else {
-                    logger.warn("Configured credentials file not found: {}", path.toAbsolutePath());
-                }
+                return loadFromFilePath(credentialsFile);
             }
 
-            // Priority 2: Try default Docker location
-            Path dockerPath = Paths.get("/app/config/credentials.json");
-            logger.info("Checking Docker default location: {}", dockerPath);
-            if (Files.exists(dockerPath)) {
-                String content = Files.readString(dockerPath);
-                if (content != null && !content.trim().isEmpty()) {
-                    logger.info("✅ Successfully loaded credentials from Docker location: {} ({} bytes)",
-                            dockerPath, content.length());
-                    return content;
-                } else {
-                    logger.warn("Docker credentials file is empty: {}", dockerPath);
-                }
-            } else {
-                logger.warn("Docker credentials file not found: {}", dockerPath);
-            }
-
-            // Priority 3: Try classpath resource as last resort
-            logger.info("Checking classpath for credentials.json");
-            Resource resource = new ClassPathResource("credentials.json");
-            if (resource.exists()) {
-                try (InputStream is = resource.getInputStream()) {
-                    String content = new String(is.readAllBytes());
-                    if (content != null && !content.trim().isEmpty()) {
-                        logger.info("✅ Successfully loaded credentials from classpath: credentials.json ({} bytes)",
-                                content.length());
-                        return content;
-                    } else {
-                        logger.warn("Classpath credentials file is empty");
-                    }
-                }
-            } else {
-                logger.warn("Classpath credentials file not found");
-            }
-
-            // Priority 4: Try environment variable as final fallback
-            String envCreds = getCredentialsFromEnvironment();
-            if (envCreds != null && !envCreds.trim().isEmpty()) {
-                logger.info("✅ Successfully loaded credentials from environment variable ({} bytes)",
-                        envCreds.length());
-                return envCreds;
-            }
+            // Fallback to environment variable
+            return getCredentialsFromEnvironment();
 
         } catch (Exception e) {
             logger.error("❌ Failed to read credentials from file", e);
+            return null;
+        }
+    }
+
+    private String loadFromClasspath(String classpathLocation) throws IOException {
+        logger.info("Loading credentials from classpath: {}", classpathLocation);
+        Resource resource = resourceLoader.getResource("classpath:" + classpathLocation);
+
+        if (!resource.exists()) {
+            logger.warn("Classpath resource not found: {}", classpathLocation);
+            return null;
         }
 
-        logger.error("❌ No credentials found in any location");
+        try (InputStream is = resource.getInputStream()) {
+            String content = new String(is.readAllBytes());
+            if (content != null && !content.trim().isEmpty()) {
+                logger.info("✅ Successfully loaded credentials from classpath: {} ({} bytes)",
+                        classpathLocation, content.length());
+                return content;
+            }
+        }
+        return null;
+    }
+
+    private String loadFromFilePath(String filePath) throws IOException {
+        logger.info("Loading credentials from file path: {}", filePath);
+        Path path = Paths.get(filePath);
+
+        if (!Files.exists(path)) {
+            logger.warn("Credentials file not found: {}", path.toAbsolutePath());
+            return null;
+        }
+
+        String content = Files.readString(path);
+        if (content != null && !content.trim().isEmpty()) {
+            logger.info("✅ Successfully loaded credentials from file: {} ({} bytes)",
+                    path.toAbsolutePath(), content.length());
+            return content;
+        }
         return null;
     }
 
@@ -321,34 +319,17 @@ public class GoogleSheetsService {
      */
     public String getCredentialSourceInfo() {
         try {
-            // Check file-based first
-            if (credentialsFile != null && !credentialsFile.trim().isEmpty()) {
-                String filePath = credentialsFile.replace("file:", "").trim();
-                Path path = Paths.get(filePath);
-                if (Files.exists(path)) {
-                    return "Credentials loaded from configured file: " + path.toAbsolutePath();
-                }
+            if (credentialsFile != null && credentialsFile.startsWith("classpath:")) {
+                String classpathLocation = credentialsFile.substring("classpath:".length());
+                return "Credentials loaded from classpath: " + classpathLocation;
+            } else if (credentialsFile != null && credentialsFile.startsWith("file:")) {
+                String filePath = credentialsFile.substring("file:".length());
+                return "Credentials loaded from file: " + filePath;
+            } else if (credentialsFile != null) {
+                return "Credentials loaded from: " + credentialsFile;
+            } else {
+                return "No credentials file specified";
             }
-
-            // Check Docker location
-            Path dockerPath = Paths.get("/app/config/credentials.json");
-            if (Files.exists(dockerPath)) {
-                return "Credentials loaded from Docker location: " + dockerPath;
-            }
-
-            // Check classpath
-            Resource resource = new ClassPathResource("credentials.json");
-            if (resource.exists()) {
-                return "Credentials loaded from classpath: credentials.json";
-            }
-
-            // Check environment
-            String envCreds = getCredentialsFromEnvironment();
-            if (envCreds != null) {
-                return "Credentials loaded from environment variable";
-            }
-
-            return "No credentials found in any location";
         } catch (Exception e) {
             return "Error checking credential source: " + e.getMessage();
         }
